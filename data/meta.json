@@ -1,0 +1,770 @@
+{
+ "scenarios": {
+  "default": {
+   "label": "Atlas defaults (Ω≤5, Caserini dilution, 25 kg/s, own EEZ, ship or outfall)",
+   "n_sources": 9220,
+   "n_ok": 4716,
+   "status": {
+    "ok": 4716,
+    "no_port_within_reach": 3210,
+    "no_viable_chain": 1294
+   },
+   "best": 179.2,
+   "p10": 220.0,
+   "median": 268.0,
+   "ship_share": 0.466,
+   "prelim_storage_share": 0.821,
+   "by_kind": [
+    {
+     "kind": "cement_plant",
+     "count": 1547,
+     "min": 191.1,
+     "median": 324.2
+    },
+    {
+     "kind": "greenfield",
+     "count": 2959,
+     "min": 183.1,
+     "median": 251.9
+    },
+    {
+     "kind": "lime_plant",
+     "count": 187,
+     "min": 185.8,
+     "median": 241.2
+    },
+    {
+     "kind": "magnesite",
+     "count": 23,
+     "min": 179.2,
+     "median": 214.5
+    }
+   ],
+   "scenario": {
+    "name": "default",
+    "year": 2040,
+    "variant": "NOAK",
+    "which": "central",
+    "horizon_yr": 15,
+    "omega_cap": 5.0,
+    "dilution": 1.0,
+    "rate_nom_kg_s": 25.0,
+    "jurisdiction": "own",
+    "own_eez_min_frac": 0.5,
+    "own_eez_min_km2": 10000.0,
+    "port_rule": "generous",
+    "storage_tiers": [
+     "operational",
+     "construction",
+     "permitted",
+     "planned",
+     "assessed_site",
+     "basin_only"
+    ],
+    "product_shipped": "oxide",
+    "max_port_km": 600.0,
+    "max_transit_km": 5000.0,
+    "max_port_attach_km": 350.0,
+    "n_ports": 25,
+    "max_storage_km": 1500.0,
+    "n_storage": 12,
+    "clean_power_mode": "continuous",
+    "clean_power_storage_set": "battery",
+    "sources": [
+     "lime",
+     "cement",
+     "magnesite",
+     "greenfield"
+    ],
+    "modes": [
+     "ship",
+     "outfall"
+    ],
+    "kiln_override_usd_t": -1.0,
+    "outfall_max_poly_km": 150.0,
+    "outfall_mean_slurry_km": 15.0,
+    "quarry_coastal_km": 30.0,
+    "outfall_max_inland_km": 20.0
+   }
+  },
+  "ship_only": {
+   "label": "Ship dispersal only (no coastal outfalls)",
+   "n_sources": 9220,
+   "n_ok": 4710,
+   "status": {
+    "ok": 4710,
+    "no_port_within_reach": 3210,
+    "no_viable_chain": 1300
+   },
+   "best": 189.2,
+   "p10": 244.4,
+   "median": 321.5,
+   "ship_share": 1.0,
+   "prelim_storage_share": 0.844,
+   "by_kind": [
+    {
+     "kind": "cement_plant",
+     "count": 1547,
+     "min": 204.1,
+     "median": 328.5
+    },
+    {
+     "kind": "greenfield",
+     "count": 2953,
+     "min": 197.9,
+     "median": 322.7
+    },
+    {
+     "kind": "lime_plant",
+     "count": 187,
+     "min": 189.2,
+     "median": 243.2
+    },
+    {
+     "kind": "magnesite",
+     "count": 23,
+     "min": 224.2,
+     "median": 264.1
+    }
+   ],
+   "scenario": {
+    "name": "ship_only",
+    "year": 2040,
+    "variant": "NOAK",
+    "which": "central",
+    "horizon_yr": 15,
+    "omega_cap": 5.0,
+    "dilution": 1.0,
+    "rate_nom_kg_s": 25.0,
+    "jurisdiction": "own",
+    "own_eez_min_frac": 0.5,
+    "own_eez_min_km2": 10000.0,
+    "port_rule": "generous",
+    "storage_tiers": [
+     "operational",
+     "construction",
+     "permitted",
+     "planned",
+     "assessed_site",
+     "basin_only"
+    ],
+    "product_shipped": "oxide",
+    "max_port_km": 600.0,
+    "max_transit_km": 5000.0,
+    "max_port_attach_km": 350.0,
+    "n_ports": 25,
+    "max_storage_km": 1500.0,
+    "n_storage": 12,
+    "clean_power_mode": "continuous",
+    "clean_power_storage_set": "battery",
+    "sources": [
+     "lime",
+     "cement",
+     "magnesite",
+     "greenfield"
+    ],
+    "modes": [
+     "ship"
+    ],
+    "kiln_override_usd_t": -1.0,
+    "outfall_max_poly_km": 150.0,
+    "outfall_mean_slurry_km": 15.0,
+    "quarry_coastal_km": 30.0,
+    "outfall_max_inland_km": 20.0
+   }
+  },
+  "pov_chem": {
+   "label": "Permissive ocean side (Ω≤12.5, 10× dilution, 100 kg/s, any EEZ)",
+   "n_sources": 9220,
+   "n_ok": 5778,
+   "status": {
+    "ok": 5778,
+    "no_port_within_reach": 3210,
+    "no_viable_chain": 232
+   },
+   "best": 162.4,
+   "p10": 192.8,
+   "median": 225.8,
+   "ship_share": 1.0,
+   "prelim_storage_share": 0.852,
+   "by_kind": [
+    {
+     "kind": "cement_plant",
+     "count": 1787,
+     "min": 171.8,
+     "median": 236.9
+    },
+    {
+     "kind": "greenfield",
+     "count": 3653,
+     "min": 163.9,
+     "median": 223.1
+    },
+    {
+     "kind": "lime_plant",
+     "count": 283,
+     "min": 162.4,
+     "median": 194.2
+    },
+    {
+     "kind": "magnesite",
+     "count": 55,
+     "min": 168.4,
+     "median": 212.6
+    }
+   ],
+   "scenario": {
+    "name": "pov_chem",
+    "year": 2040,
+    "variant": "NOAK",
+    "which": "central",
+    "horizon_yr": 15,
+    "omega_cap": 12.5,
+    "dilution": 10.0,
+    "rate_nom_kg_s": 100.0,
+    "jurisdiction": "any",
+    "own_eez_min_frac": 0.5,
+    "own_eez_min_km2": 10000.0,
+    "port_rule": "generous",
+    "storage_tiers": [
+     "operational",
+     "construction",
+     "permitted",
+     "planned",
+     "assessed_site",
+     "basin_only"
+    ],
+    "product_shipped": "oxide",
+    "max_port_km": 600.0,
+    "max_transit_km": 5000.0,
+    "max_port_attach_km": 350.0,
+    "n_ports": 25,
+    "max_storage_km": 1500.0,
+    "n_storage": 12,
+    "clean_power_mode": "continuous",
+    "clean_power_storage_set": "battery",
+    "sources": [
+     "lime",
+     "cement",
+     "magnesite",
+     "greenfield"
+    ],
+    "modes": [
+     "ship",
+     "outfall"
+    ],
+    "kiln_override_usd_t": -1.0,
+    "outfall_max_poly_km": 150.0,
+    "outfall_mean_slurry_km": 15.0,
+    "quarry_coastal_km": 30.0,
+    "outfall_max_inland_km": 20.0
+   }
+  },
+  "pov_kiln_chem": {
+   "label": "Permissive ocean side + $56/tCaO calcination (vendor claim)",
+   "n_sources": 9220,
+   "n_ok": 5778,
+   "status": {
+    "ok": 5778,
+    "no_port_within_reach": 3210,
+    "no_viable_chain": 232
+   },
+   "best": 112.6,
+   "p10": 143.6,
+   "median": 175.3,
+   "ship_share": 1.0,
+   "prelim_storage_share": 0.842,
+   "by_kind": [
+    {
+     "kind": "cement_plant",
+     "count": 1787,
+     "min": 127.6,
+     "median": 181.3
+    },
+    {
+     "kind": "greenfield",
+     "count": 3653,
+     "min": 118.4,
+     "median": 175.4
+    },
+    {
+     "kind": "lime_plant",
+     "count": 283,
+     "min": 112.6,
+     "median": 140.0
+    },
+    {
+     "kind": "magnesite",
+     "count": 55,
+     "min": 124.0,
+     "median": 157.8
+    }
+   ],
+   "scenario": {
+    "name": "pov_kiln_chem",
+    "year": 2040,
+    "variant": "NOAK",
+    "which": "central",
+    "horizon_yr": 15,
+    "omega_cap": 12.5,
+    "dilution": 10.0,
+    "rate_nom_kg_s": 100.0,
+    "jurisdiction": "any",
+    "own_eez_min_frac": 0.5,
+    "own_eez_min_km2": 10000.0,
+    "port_rule": "generous",
+    "storage_tiers": [
+     "operational",
+     "construction",
+     "permitted",
+     "planned",
+     "assessed_site",
+     "basin_only"
+    ],
+    "product_shipped": "oxide",
+    "max_port_km": 600.0,
+    "max_transit_km": 5000.0,
+    "max_port_attach_km": 350.0,
+    "n_ports": 25,
+    "max_storage_km": 1500.0,
+    "n_storage": 12,
+    "clean_power_mode": "continuous",
+    "clean_power_storage_set": "battery",
+    "sources": [
+     "lime",
+     "cement",
+     "magnesite",
+     "greenfield"
+    ],
+    "modes": [
+     "ship",
+     "outfall"
+    ],
+    "kiln_override_usd_t": 56.0,
+    "outfall_max_poly_km": 150.0,
+    "outfall_mean_slurry_km": 15.0,
+    "quarry_coastal_km": 30.0,
+    "outfall_max_inland_km": 20.0
+   }
+  }
+ },
+ "generated": "2026-09-23 17:12",
+ "efficiency": {
+  "median_e15": 0.774,
+  "p10_e15": 0.673,
+  "p90_e15": 0.812,
+  "share_below_084": 0.97,
+  "median_rmax5": 12.9,
+  "share_rmax5_below_25": 0.745
+ },
+ "method": {
+  "params": {
+   "wacc": {
+    "c": 0.08,
+    "lo": 0.06,
+    "hi": 0.1,
+    "u": "fraction (real)",
+    "st": "judgement"
+   },
+   "life_plant": {
+    "c": 30.0,
+    "lo": 25.0,
+    "hi": 40.0,
+    "u": "yr",
+    "st": "judgement"
+   },
+   "capacity_factor_kiln": {
+    "c": 0.9,
+    "lo": 0.85,
+    "hi": 0.95,
+    "u": "fraction",
+    "st": "judgement"
+   },
+   "capex_gas_kiln": {
+    "c": 150.0,
+    "lo": 100.0,
+    "hi": 250.0,
+    "u": "$/(t/yr) product",
+    "st": "judgement"
+   },
+   "capex_elec_indirect": {
+    "c": 250.0,
+    "lo": 150.0,
+    "hi": 500.0,
+    "u": "$/(t/yr) product",
+    "st": "judgement"
+   },
+   "capex_elec_plasma": {
+    "c": 250.0,
+    "lo": 150.0,
+    "hi": 500.0,
+    "u": "$/(t/yr) product",
+    "st": "judgement"
+   },
+   "heat_gas_oxy_CaO": {
+    "c": 3.7,
+    "lo": 3.4,
+    "hi": 4.6,
+    "u": "GJ(LHV)/t CaO",
+    "st": "verified_primary"
+   },
+   "heat_gas_post_CaO": {
+    "c": 3.7,
+    "lo": 3.4,
+    "hi": 4.6,
+    "u": "GJ(LHV)/t CaO",
+    "st": "verified_primary"
+   },
+   "elec_heat_elec_indirect_CaO": {
+    "c": 1.25,
+    "lo": 1.0,
+    "hi": 1.6,
+    "u": "MWh/t CaO",
+    "st": "judgement"
+   },
+   "elec_heat_elec_plasma_CaO": {
+    "c": 1.2,
+    "lo": 1.0,
+    "hi": 2.0,
+    "u": "MWh/t CaO",
+    "st": "judgement"
+   },
+   "capture_rate_gas_oxy": {
+    "c": 0.95,
+    "lo": 0.9,
+    "hi": 0.98,
+    "u": "fraction of process+fuel CO2",
+    "st": "judgement"
+   },
+   "capture_rate_gas_post": {
+    "c": 0.9,
+    "lo": 0.85,
+    "hi": 0.95,
+    "u": "fraction of flue CO2",
+    "st": "judgement"
+   },
+   "capture_rate_elec": {
+    "c": 0.98,
+    "lo": 0.95,
+    "hi": 0.99,
+    "u": "fraction of process CO2",
+    "st": "judgement"
+   },
+   "capture_cost_gas_oxy": {
+    "c": 53.3,
+    "lo": 40.0,
+    "hi": 74.7,
+    "u": "$/t CO2 captured",
+    "st": "derived"
+   },
+   "capture_cost_gas_post": {
+    "c": 93.1,
+    "lo": 65.0,
+    "hi": 141.2,
+    "u": "$/t CO2 captured",
+    "st": "derived"
+   },
+   "capture_cost_elec": {
+    "c": 12.0,
+    "lo": 8.0,
+    "hi": 20.0,
+    "u": "$/t CO2 captured",
+    "st": "judgement"
+   },
+   "upstream_ghg_gas": {
+    "c": 12.2,
+    "lo": 8.0,
+    "hi": 17.5,
+    "u": "g CO2e/MJ",
+    "st": "verified_primary"
+   },
+   "gas_price_us": {
+    "c": 4.27,
+    "lo": 2.84,
+    "hi": 8.5,
+    "u": "$/MMBtu (HHV)",
+    "st": "verified_primary"
+   },
+   "gas_price_europe": {
+    "c": 8.5,
+    "lo": 6.0,
+    "hi": 13.0,
+    "u": "$/MMBtu (HHV)",
+    "st": "judgement"
+   },
+   "gas_price_asia": {
+    "c": 10.0,
+    "lo": 7.5,
+    "hi": 14.4,
+    "u": "$/MMBtu (HHV)",
+    "st": "judgement"
+   },
+   "gas_price_middle_east_other": {
+    "c": 3.0,
+    "lo": 1.5,
+    "hi": 6.0,
+    "u": "$/MMBtu (HHV)",
+    "st": "UNVERIFIED"
+   },
+   "elec_price_clean_firm": {
+    "c": 55.0,
+    "lo": 35.0,
+    "hi": 90.0,
+    "u": "$/MWh",
+    "st": "judgement"
+   },
+   "quarry_crush_lump": {
+    "c": 12.0,
+    "lo": 8.0,
+    "hi": 18.5,
+    "u": "$/t rock",
+    "st": "judgement"
+   },
+   "quarry_yield_factor": {
+    "c": 1.05,
+    "lo": 1.0,
+    "hi": 1.3,
+    "u": "t quarried per t kiln feed",
+    "st": "judgement"
+   },
+   "fine_grind_add": {
+    "c": 3.0,
+    "lo": 1.5,
+    "hi": 5.0,
+    "u": "$/t rock",
+    "st": "derived"
+   },
+   "rail_rate": {
+    "c": 0.03,
+    "lo": 0.02,
+    "hi": 0.05,
+    "u": "$/t-km",
+    "st": "UNVERIFIED"
+   },
+   "truck_rate": {
+    "c": 0.1,
+    "lo": 0.07,
+    "hi": 0.15,
+    "u": "$/t-km loaded",
+    "st": "UNVERIFIED"
+   },
+   "quicklime_land_premium": {
+    "c": 1.5,
+    "lo": 1.3,
+    "hi": 2.0,
+    "u": "x limestone rate",
+    "st": "judgement"
+   },
+   "pipe_onshore_ref": {
+    "c": 7.6,
+    "lo": 5.5,
+    "hi": 12.2,
+    "u": "$/t CO2 per 100 km at 1 MtCO2/yr",
+    "st": "derived"
+   },
+   "pipe_scale_exponent": {
+    "c": 0.88,
+    "lo": 0.6,
+    "hi": 1.0,
+    "u": "-",
+    "st": "derived"
+   },
+   "storage_saline_onshore": {
+    "c": 9.27,
+    "lo": 7.88,
+    "hi": 15.34,
+    "u": "$/t CO2 injected",
+    "st": "verified_primary"
+   },
+   "storage_saline_offshore": {
+    "c": 19.34,
+    "lo": 8.93,
+    "hi": 29.75,
+    "u": "$/t CO2 injected",
+    "st": "verified_primary"
+   },
+   "storage_ism_basalt": {
+    "c": 31.23,
+    "lo": 15.0,
+    "hi": 50.0,
+    "u": "$/t CO2 injected",
+    "st": "UNVERIFIED"
+   },
+   "port_loading_dues": {
+    "c": 3.76,
+    "lo": 2.8,
+    "hi": 8.0,
+    "u": "$/t loaded",
+    "st": "derived"
+   },
+   "ship_tc_rate_handysize": {
+    "c": 12300.0,
+    "lo": 11840.0,
+    "hi": 18000.0,
+    "u": "$/day (time charter, excl. fuel and port)",
+    "st": "verified_primary"
+   },
+   "ship_tc_rate_capesize": {
+    "c": 22000.0,
+    "lo": 19700.0,
+    "hi": 33000.0,
+    "u": "$/day (time charter, excl. fuel and port)",
+    "st": "verified_primary"
+   },
+   "ship_discharge_speed": {
+    "c": 25.0,
+    "lo": 20.0,
+    "hi": 30.0,
+    "u": "km/h",
+    "st": "verified_primary"
+   },
+   "vlsfo_price": {
+    "c": 560.0,
+    "lo": 480.0,
+    "hi": 860.0,
+    "u": "$/t",
+    "st": "UNVERIFIED"
+   },
+   "slaking_onshore": {
+    "c": 5.0,
+    "lo": 3.0,
+    "hi": 8.0,
+    "u": "$/t CaO slaked",
+    "st": "judgement"
+   },
+   "slurry_distribution": {
+    "c": 0.1,
+    "lo": 0.05,
+    "hi": 0.2,
+    "u": "$/t Ca(OH)2-km",
+    "st": "judgement"
+   },
+   "outfall_capacity_dalhousie": {
+    "c": 31.1,
+    "lo": 31.1,
+    "hi": 155.5,
+    "u": "kt CDR/yr per outfall",
+    "st": "internal_frontier"
+   },
+   "outfall_capex_each": {
+    "c": 3000000.0,
+    "lo": 1000000.0,
+    "hi": 6000000.0,
+    "u": "$ per outfall",
+    "st": "judgement"
+   },
+   "mrv": {
+    "c": 5.0,
+    "lo": 2.0,
+    "hi": 15.0,
+    "u": "$/t CDR",
+    "st": "judgement"
+   },
+   "dispersal_ops_other": {
+    "c": 1.0,
+    "lo": 0.0,
+    "hi": 5.0,
+    "u": "$/t CDR",
+    "st": "judgement"
+   },
+   "working_capital": {
+    "c": 0.02,
+    "lo": 0.01,
+    "hi": 0.04,
+    "u": "fraction of levelised cost",
+    "st": "judgement"
+   }
+  },
+  "scenario": {
+   "name": "default",
+   "year": 2040,
+   "variant": "NOAK",
+   "which": "central",
+   "horizon_yr": 15,
+   "omega_cap": 5.0,
+   "dilution": 1.0,
+   "rate_nom_kg_s": 25.0,
+   "jurisdiction": "own",
+   "own_eez_min_frac": 0.5,
+   "own_eez_min_km2": 10000.0,
+   "port_rule": "generous",
+   "storage_tiers": [
+    "operational",
+    "construction",
+    "permitted",
+    "planned",
+    "assessed_site",
+    "basin_only"
+   ],
+   "product_shipped": "oxide",
+   "max_port_km": 600.0,
+   "max_transit_km": 5000.0,
+   "max_port_attach_km": 350.0,
+   "n_ports": 25,
+   "max_storage_km": 1500.0,
+   "n_storage": 12,
+   "clean_power_mode": "continuous",
+   "clean_power_storage_set": "battery",
+   "sources": [
+    "lime",
+    "cement",
+    "magnesite",
+    "greenfield"
+   ],
+   "modes": [
+    "ship",
+    "outfall"
+   ],
+   "kiln_override_usd_t": -1.0,
+   "outfall_max_poly_km": 150.0,
+   "outfall_mean_slurry_km": 15.0,
+   "quarry_coastal_km": 30.0,
+   "outfall_max_inland_km": 20.0
+  },
+  "purity": {
+   "lime": 0.95,
+   "dolime": 0.95,
+   "magnesia": 0.92,
+   "cement": 0.85,
+   "magnesite": 0.9,
+   "greenfield": 0.85
+  },
+  "products": {
+   "CaO": {
+    "rock_t_per_t": 1.785,
+    "process_co2_t_per_t": 0.785,
+    "max_uptake_tco2_per_t": 1.57
+   },
+   "MgO": {
+    "rock_t_per_t": 2.092,
+    "process_co2_t_per_t": 1.092,
+    "max_uptake_tco2_per_t": 2.184
+   },
+   "dolime": {
+    "rock_t_per_t": 1.913,
+    "process_co2_t_per_t": 0.913,
+    "max_uptake_tco2_per_t": 1.826
+   },
+   "CaOH2": {
+    "rock_t_per_t": 1.351,
+    "process_co2_t_per_t": 0.594,
+    "max_uptake_tco2_per_t": 1.188
+   }
+  },
+  "chem": {
+   "ref_rate": 100.0,
+   "ref_dta": 1000.0,
+   "omega_caps": [
+    5.0,
+    7.0,
+    12.5
+   ],
+   "dilution": [
+    1.0,
+    3.0,
+    10.0
+   ]
+  },
+  "clean_grid_threshold_g": 50
+ }
+}

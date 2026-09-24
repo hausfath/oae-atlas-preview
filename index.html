@@ -1,0 +1,705 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>OAE Supply-Chain Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+  /* ---- tokens: chalk and sea ---------------------------------------------------------- */
+  :root { color-scheme: light;
+    --page:#eef0f1; --surface:#ffffff; --surface-2:#f3f5f6; --ink:#1d2733; --ink-2:#56606b; --ink-3:#8a939c;
+    --line:#e2e6e9; --focus:#1f6fb2;
+    --land:#e3e5e3; --border:#c3c8cb; --sea:#f4f6f7;
+    --e1:#cde2fb; --e2:#9ec5f4; --e3:#6da7ec; --e4:#3987e5; --e5:#256abf; --e6:#184f95; --e7:#0d366b; --e0:#f0f2f3;
+    --c1:#3d0832; --c2:#5e1249; --c3:#801e60; --c4:#a12d74; --c5:#bd4487; --c6:#d3629c; --c7:#e07dac;
+    --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#4a3aa7;
+    --chain:#1d2733; --rock:#7d858c; --co2:#5b48c2; --warn:#8a5a00; --warn-bg:#fff4dc;
+    --shadow:0 1px 2px rgba(29,39,51,.06), 0 8px 24px rgba(29,39,51,.10); }
+  @media (prefers-color-scheme: dark) { :root:where(:not([data-theme="light"])) { color-scheme: dark;
+    --page:#0f1418; --surface:#161c22; --surface-2:#1e252c; --ink:#e8edf1; --ink-2:#b3bcc4; --ink-3:#7f8992;
+    --line:#29313a; --focus:#6aa9e6;
+    --land:#1a1f25; --border:#343c45; --sea:#0d1115;
+    --e1:#10233c; --e2:#123359; --e3:#184f95; --e4:#256abf; --e5:#3987e5; --e6:#6da7ec; --e7:#b7d3f6; --e0:#141a20;
+    --c1:#fde3ef; --c2:#f6bad7; --c3:#ed92bf; --c4:#e06ba7; --c5:#cf4b92; --c6:#b8367f; --c7:#9b2a6e;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#9085e9;
+    --chain:#e8edf1; --rock:#8f99a2; --co2:#a495f0; --warn:#f3c56b; --warn-bg:#35290f;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35); } }
+  :root[data-theme="dark"] { color-scheme: dark;
+    --page:#0f1418; --surface:#161c22; --surface-2:#1e252c; --ink:#e8edf1; --ink-2:#b3bcc4; --ink-3:#7f8992;
+    --line:#29313a; --focus:#6aa9e6;
+    --land:#1a1f25; --border:#343c45; --sea:#0d1115;
+    --e1:#10233c; --e2:#123359; --e3:#184f95; --e4:#256abf; --e5:#3987e5; --e6:#6da7ec; --e7:#b7d3f6; --e0:#141a20;
+    --c1:#fde3ef; --c2:#f6bad7; --c3:#ed92bf; --c4:#e06ba7; --c5:#cf4b92; --c6:#b8367f; --c7:#9b2a6e;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#9085e9;
+    --chain:#e8edf1; --rock:#8f99a2; --co2:#a495f0; --warn:#f3c56b; --warn-bg:#35290f;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35); }
+
+  /* ---- base --------------------------------------------------------------------------- */
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{font:14px/1.45 "Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--page);
+       display:grid;grid-template-rows:auto 1fr}
+  button,select,input{font:inherit;color:inherit}
+  :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+  .num{font-variant-numeric:tabular-nums}
+  svg.g{flex:none;display:block}
+
+  /* ---- top bar ------------------------------------------------------------------------ */
+  #bar{display:flex;align-items:center;gap:14px;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--line);min-width:0}
+  #bar h1{font-size:16px;font-weight:700;margin:0;letter-spacing:-.01em;white-space:nowrap}
+  .pill{font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;background:var(--warn-bg);color:var(--warn);border:0;cursor:pointer;white-space:nowrap}
+  #scen-wrap{display:flex;align-items:center;gap:8px;margin-left:auto;min-width:0}
+  #scen-wrap label{color:var(--ink-2);font-size:13px}
+  select{padding:6px 28px 6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);max-width:100%;
+         appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink-2) 50%),linear-gradient(135deg,var(--ink-2) 50%,transparent 50%);
+         background-position:calc(100% - 15px) 55%,calc(100% - 10px) 55%;background-size:5px 5px;background-repeat:no-repeat;cursor:pointer}
+  #scen{width:min(440px,42vw)}
+  .ibtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;white-space:nowrap}
+  .ibtn:hover{background:var(--surface-2)}
+
+  /* ---- layout ------------------------------------------------------------------------- */
+  #app{display:grid;grid-template-columns:300px minmax(0,1fr);min-height:0}
+  #panel{background:var(--surface);border-right:1px solid var(--line);overflow-y:auto;padding:18px 18px 24px;min-width:0}
+  #mapwrap{position:relative;min-width:0}
+  #map{position:absolute;inset:0;background:var(--sea)}
+  .leaflet-container{font:inherit;background:var(--sea)}
+
+  /* ---- left panel --------------------------------------------------------------------- */
+  .sec{margin-bottom:22px}
+  .sec h2{font-size:13px;font-weight:600;color:var(--ink);margin:0 0 8px}
+  .figs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:2px 0 8px}
+  .fig .v{font-size:22px;font-weight:600;letter-spacing:-.02em;line-height:1.1}
+  .fig .l{font-size:12px;color:var(--ink-2)}
+  .fig.best .v{color:var(--c3)}
+  .note{font-size:12.5px;color:var(--ink-2);margin:6px 0 0}
+  .tog{display:flex;align-items:center;gap:10px;padding:6px 8px;margin:0 -8px;border-radius:8px;cursor:pointer;font-size:13.5px}
+  .tog:hover{background:var(--surface-2)}
+  .tog input{width:16px;height:16px;accent-color:var(--c3);margin:0;flex:none}
+  .tog .sym{margin-right:-3px}
+  .tog .cnt{margin-left:auto;color:var(--ink-3);font-size:12.5px}
+  .tog .sub{display:block;font-size:12px;color:var(--ink-3)}
+  .list{list-style:none;margin:0;padding:0}
+  .list li{display:flex;align-items:center;gap:9px;padding:7px 8px;margin:0 -8px;border-radius:8px;cursor:pointer}
+  .list li:hover,.list li.sel{background:var(--surface-2)}
+  .list .dot{width:10px;height:10px;border-radius:50%;flex:none}
+  .list .nm{min-width:0;flex:1}
+  .list .nm b{display:block;font-weight:500;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .list .nm span{font-size:12px;color:var(--ink-3)}
+  .list .usd{font-size:13px;font-weight:600}
+  .empty{font-size:13px;color:var(--ink-3)}
+
+  /* ---- map legend (floating) ---------------------------------------------------------- */
+  #legend{position:absolute;left:12px;bottom:28px;z-index:900;background:var(--surface);border:1px solid var(--line);border-radius:10px;
+          box-shadow:var(--shadow);padding:10px 12px 8px;width:268px;font-size:12px}
+  #legend .t{font-weight:600;font-size:12px;margin:0 0 4px}
+  #legend .ramp{display:flex;height:10px;border-radius:3px;overflow:hidden}
+  #legend .ramp span{flex:1}
+  #legend .ticks{position:relative;height:16px;color:var(--ink-2)} #legend .ticks span{position:absolute;transform:translateX(-50%)}
+  #legend .blk+.blk{margin-top:8px}
+  #legend .keys{display:flex;flex-wrap:wrap;gap:2px 14px;color:var(--ink-2);margin-top:6px}
+  #legend .keys span{display:inline-flex;align-items:center;gap:5px}
+  #legend-toggle{position:absolute;left:12px;bottom:28px;z-index:899;display:none}
+
+  /* ---- right panel -------------------------------------------------------------------- */
+  #info{display:none;position:absolute;top:12px;right:12px;width:352px;max-height:calc(100% - 24px);overflow:auto;z-index:1000;
+        background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:16px 18px 18px}
+  #info .close{position:absolute;top:10px;right:10px;width:30px;height:30px;border:0;border-radius:8px;background:transparent;cursor:pointer;
+               color:var(--ink-2);display:grid;place-items:center}
+  #info .close:hover{background:var(--surface-2)}
+  #info h3{font-size:16px;line-height:1.25;margin:0 34px 2px 0}
+  #info .meta{color:var(--ink-2);font-size:13px}
+  #info .cost{display:flex;align-items:baseline;gap:6px;margin:12px 0 2px}
+  #info .cost b{font-size:30px;font-weight:600;letter-spacing:-.02em}
+  #info .cost span{color:var(--ink-2);font-size:13px}
+  #info .kv{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 0}
+  #info .kv div{background:var(--surface-2);border-radius:8px;padding:7px 9px}
+  #info .kv b{display:block;font-size:15px;font-weight:600} #info .kv span{font-size:12px;color:var(--ink-2)}
+  #info h4{font-size:13px;font-weight:600;margin:18px 0 8px}
+  .bar{display:flex;height:12px;gap:2px;margin-bottom:8px}
+  .bar span{height:100%;border-radius:2px} .bar span:first-child{border-radius:4px 2px 2px 4px} .bar span:last-child{border-radius:2px 4px 4px 2px}
+  .brk{width:100%;border-collapse:collapse;font-size:13px}
+  .brk td{padding:2px 0} .brk td.r{text-align:right;padding-left:10px} .brk td.p{text-align:right;color:var(--ink-3);width:42px}
+  .sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:7px;vertical-align:-1px}
+  .steps{list-style:none;margin:0;padding:0}
+  .steps li{display:grid;grid-template-columns:34px 1fr;gap:8px;padding:6px 0;border-top:1px solid var(--line)}
+  .steps li:first-child{border-top:0}
+  .steps .gl{display:grid;place-items:center;height:22px}
+  .steps b{display:block;font-weight:600;font-size:13px} .steps span{font-size:12.5px;color:var(--ink-2)}
+  .flags{display:flex;flex-wrap:wrap;gap:6px}
+  .flag{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:3px 8px;border-radius:999px;background:var(--warn-bg);color:var(--warn)}
+
+  /* ---- about dialog, loading, tooltips ------------------------------------------------ */
+  dialog{border:0;border-radius:14px;padding:0;width:min(640px,calc(100vw - 32px));max-height:calc(100vh - 48px);background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+  dialog::backdrop{background:rgba(15,20,24,.45)}
+  dialog .in{padding:22px 26px 24px;overflow:auto;max-height:calc(100vh - 48px)}
+  dialog h2{font-size:19px;margin:0 0 10px} dialog h3{font-size:14px;margin:18px 0 6px}
+  dialog p,dialog li{font-size:13.5px;color:var(--ink-2);max-width:66ch} dialog ul{padding-left:18px;margin:6px 0}
+  dialog .x{position:absolute;top:14px;right:14px}
+  dialog{width:min(860px,calc(100vw - 32px))}
+  dialog h3{font-size:15px;margin:24px 0 8px;color:var(--ink);scroll-margin-top:12px}
+  dialog h4{font-size:13.5px;margin:14px 0 4px;color:var(--ink)}
+  .toc{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 6px}
+  .toc a{font-size:12.5px;color:var(--ink-2);text-decoration:none;padding:3px 9px;border-radius:999px;background:var(--surface-2)}
+  .toc a:hover{color:var(--ink)}
+  .eq{background:var(--surface-2);border-radius:8px;padding:10px 14px;margin:6px 0 4px;font-size:14px;color:var(--ink);overflow-x:auto;
+      font-family:"STIX Two Text","Cambria Math",Georgia,serif;line-height:1.7}
+  .eq var{font-style:italic} .eq .w{font-family:inherit}
+  .where{font-size:12.5px;color:var(--ink-2);margin:2px 0 10px}
+  .mt{width:100%;border-collapse:collapse;font-size:12.5px;margin:6px 0 10px}
+  .mt th{text-align:left;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--line);padding:5px 8px 5px 0}
+  .mt td{border-bottom:1px solid var(--line);padding:5px 8px 5px 0;vertical-align:top;color:var(--ink)}
+  .mt td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  #loading{position:absolute;inset:0;display:grid;place-items:center;z-index:1100;background:var(--sea);color:var(--ink-2);font-size:14px}
+  .leaflet-tooltip{background:var(--surface);color:var(--ink);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:8px;font:inherit;font-size:12.5px;padding:6px 9px}
+  .leaflet-tooltip-left:before,.leaflet-tooltip-right:before{display:none}
+  .leaflet-bar a{background:var(--surface);color:var(--ink);border-color:var(--line)}
+  .leaflet-control-scale-line{background:color-mix(in srgb,var(--surface) 80%,transparent);color:var(--ink-2);border-color:var(--ink-3)}
+  .leaflet-control-attribution{background:color-mix(in srgb,var(--surface) 80%,transparent)!important;color:var(--ink-3)}
+  .leaflet-control-attribution a{color:var(--ink-2)}
+
+  /* ---- narrow screens ----------------------------------------------------------------- */
+  #menu{display:none}
+  @media (max-width: 860px){
+    #bar{flex-wrap:wrap;gap:8px 10px} #scen-wrap{order:3;flex:1 1 100%;margin:0} #scen{width:100%} #scen-wrap label{display:none}
+    #menu{display:inline-flex}
+    #app{grid-template-columns:minmax(0,1fr)}
+    #panel{position:absolute;z-index:1050;left:0;top:0;bottom:0;width:min(320px,88vw);transform:translateX(-102%);transition:transform .2s;box-shadow:var(--shadow)}
+    #panel.open{transform:none}
+    #app{position:relative}
+    #info{position:fixed;top:auto;left:0;right:0;bottom:0;width:auto;max-height:62vh;border-radius:14px 14px 0 0}
+    #legend{width:auto;right:12px;left:12px;bottom:24px}
+    #legend.hide{display:none} #legend-toggle.show{display:inline-flex}
+  }
+  @media (prefers-reduced-motion: reduce){ #panel{transition:none} }
+</style>
+</head>
+<body>
+<header id="bar">
+  <button class="ibtn" id="menu" aria-controls="panel" aria-expanded="false">
+    <svg class="g" width="16" height="16" viewBox="0 0 16 16"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Filters</button>
+  <h1>OAE Supply-Chain Atlas</h1>
+  <button class="pill" id="internal" title="Internal to Frontier: see Methodology for what may not be shared">Internal</button>
+  <div id="scen-wrap"><label for="scen">Scenario</label><select id="scen"></select></div>
+  <button class="ibtn" id="about-btn">Methodology</button>
+  <button class="ibtn" id="theme" aria-label="Switch light or dark theme" title="Switch theme">
+    <svg class="g" width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 2.8a5.2 5.2 0 0 1 0 10.4z" fill="currentColor"/></svg></button>
+</header>
+
+<div id="app">
+  <aside id="panel" aria-label="Map controls">
+    <section class="sec">
+      <h2>Cost of the best chain, $ per net tonne CO₂</h2>
+      <div class="figs">
+        <div class="fig best"><div class="v num" id="f-best">–</div><div class="l">cheapest</div></div>
+        <div class="fig"><div class="v num" id="f-p10">–</div><div class="l">10th percentile</div></div>
+        <div class="fig"><div class="v num" id="f-med">–</div><div class="l">median</div></div>
+      </div>
+      <p class="note" id="f-n"></p>
+      <p class="note">Each source is costed on its own, so the costs of different sources can't be added up.</p>
+    </section>
+
+    <section class="sec">
+      <h2>Rock sources</h2>
+      <label class="tog"><input type="checkbox" class="kind" value="lime_plant" checked> <svg class="g sym" width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4.6" fill="var(--c4)" stroke="var(--surface)" stroke-width="1.5"/></svg>Lime plants <span class="cnt num" data-k="lime_plant"></span></label>
+      <label class="tog"><input type="checkbox" class="kind" value="cement_plant" checked> <svg class="g sym" width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4.6" fill="var(--c4)" stroke="var(--surface)" stroke-width="1.5"/></svg>Cement plants <span class="cnt num" data-k="cement_plant"></span></label>
+      <label class="tog"><input type="checkbox" class="kind" value="magnesite" checked> <svg class="g sym" width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4.6" fill="var(--c4)" stroke="var(--surface)" stroke-width="1.5"/></svg><span>Magnesite deposits<span class="sub">Rings are prospects and closed mines</span></span> <span class="cnt num" data-k="magnesite"></span></label>
+      <label class="tog"><input type="checkbox" class="kind" value="greenfield"> <svg class="g sym" width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="3.6" fill="none" stroke="var(--c4)" stroke-width="1.7"/></svg><span>Greenfield limestone<span class="sub">No permits; rock quality unknown</span></span> <span class="cnt num" data-k="greenfield"></span></label>
+    </section>
+
+    <section class="sec">
+      <h2>Only show chains that</h2>
+      <label class="tog"><input type="checkbox" id="f-prelim"> <span>Use CO₂ storage that is operating, permitted or planned<span class="sub">Hides basin estimates, unappraised sites and mineral storage</span></span></label>
+      <label class="tog"><input type="checkbox" id="f-skill"> <span>Disperse by ship<span class="sub">Hides coastal outfalls, where the ocean model is least reliable</span></span></label>
+    </section>
+
+    <section class="sec">
+      <h2><label for="olayer">Ocean layer</label></h2>
+      <select id="olayer" style="width:100%">
+        <option value="e15" selected>Efficiency after 15 years</option>
+        <option value="e10">Efficiency after 10 years</option>
+        <option value="e5">Efficiency after 5 years</option>
+        <option value="r5">Discharge limit, conservative (Ω ≤ 5)</option>
+        <option value="r12">Discharge limit, permissive (Ω ≤ 12.5)</option>
+        <option value="none">None</option>
+      </select>
+    </section>
+
+    <section class="sec">
+      <h2>Cheapest in view</h2>
+      <ul class="list" id="list"></ul>
+    </section>
+  </aside>
+
+  <main id="mapwrap">
+    <div id="map" role="application" aria-label="Map of ocean liming supply chains"></div>
+    <div id="loading">Loading map data…</div>
+    <div id="legend" aria-label="Map legend">
+      <div class="blk"><p class="t">Best-chain cost, $ per net t CO₂</p><div class="ramp" id="cost-ramp"></div><div class="ticks num" id="cost-ticks"></div>
+        <div class="keys"><span><svg class="g" width="12" height="12"><circle cx="6" cy="6" r="4.6" fill="var(--c4)" stroke="var(--surface)" stroke-width="1.5"/></svg>Existing operation</span>
+          <span><svg class="g" width="12" height="12"><circle cx="6" cy="6" r="3.6" fill="none" stroke="var(--c4)" stroke-width="1.7"/></svg>Greenfield or closed mine</span></div></div>
+      <div class="blk" id="ocean-blk"><p class="t" id="ocean-title"></p><div class="ramp" id="ocean-ramp"></div><div class="ticks num" id="ocean-ticks"></div></div>
+    </div>
+    <button class="ibtn" id="legend-toggle">Legend</button>
+    <aside id="info" aria-live="polite" aria-label="Selected source">
+      <button class="close" id="info-close" aria-label="Close (Esc)" title="Close (Esc)">
+        <svg class="g" width="14" height="14" viewBox="0 0 14 14"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+      <div id="info-body"></div>
+    </aside>
+  </main>
+</div>
+
+<dialog id="about" aria-labelledby="m-title"><div class="in">
+  <button class="ibtn x" id="about-close">Close</button>
+  <h2 id="m-title">Methodology</h2>
+  <nav class="toc" aria-label="Sections"><a href="#m-overview">Overview</a><a href="#m-eq">Equations</a><a href="#m-kiln">Kiln choice</a>
+    <a href="#m-sites">Existing vs greenfield</a><a href="#m-assume">Assumptions</a><a href="#m-data">Datasets</a><a href="#m-limits">Limits</a></nav>
+  <div id="m-body"></div>
+</div></dialog>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const COST_BINS = [150, 180, 210, 240, 280, 350];
+const ETA_BINS = [0.5, 0.6, 0.7, 0.75, 0.8, 0.85];
+const RATE_BINS = [10, 15, 20, 25, 50, 75];
+const OCEAN = {
+  e15: ["Ocean efficiency after 15 years, mol CO₂ per mol alkalinity", ETA_BINS],
+  e10: ["Ocean efficiency after 10 years, mol CO₂ per mol alkalinity", ETA_BINS],
+  e5: ["Ocean efficiency after 5 years, mol CO₂ per mol alkalinity", ETA_BINS],
+  r5: ["Max discharge per ship without precipitation (Ω ≤ 5), kg/s", RATE_BINS],
+  r12: ["Max discharge per ship without precipitation (Ω ≤ 12.5), kg/s", RATE_BINS]};
+const COMP = [["Quarry", [0]], ["Kiln and CO₂ capture", [1]], ["CO₂ transport and storage", [2]],
+              ["Land haul", [3]], ["Port and dispersal", [4, 5, 6]], ["MRV, operations, working capital", [7, 8]]];
+const STATUS = {prospect: "Magnesite prospect", past: "Former magnesite mine"};
+const KIND = {lime_plant: "Lime plant", cement_plant: "Cement plant", magnesite: "Magnesite deposit", greenfield: "Greenfield limestone district"};
+const PRODUCT = {CaO: "lime (CaO)", MgO: "magnesia (MgO)", dolime: "dolime (CaO·MgO)"};
+const ARCH = {gas_oxy: "Gas kiln with oxyfuel capture", gas_post: "Gas kiln with post-combustion capture",
+              elec_indirect: "Indirect electric calciner", elec_plasma: "Plasma electric calciner"};
+const WEAK = {c_quarry: "quarrying", c_kiln_capture: "kiln and capture", c_co2_transport_storage: "CO₂ transport and storage",
+              c_land_haul: "land haul", c_port_and_dispersal: "port and dispersal", c_mrv_ops: "MRV and operations", c_working_capital: "working capital"};
+let D = {}, meta, ports, storage, polys, land, landLayer, polyLayer, srcLayer, chainLayer, selId = null;
+
+const bin = (v, bins) => { let i = 0; while (i < bins.length && v >= bins[i]) i++; return i; };
+const costColor = v => css(`--c${bin(v, COST_BINS) + 1}`);
+const oColor = (key, v) => v == null ? css("--e0") : css(`--e${bin(v, OCEAN[key][1]) + 1}`);
+const fmt = (v, n = 0) => v == null || Number.isNaN(v) ? "–" : Number(v).toLocaleString("en-US", {maximumFractionDigits: n, minimumFractionDigits: n});
+const esc = t => String(t).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// ---- glyphs shared by the map and the chain panel ----------------------------------------
+const G = {
+  ring: () => `<svg class="g" width="22" height="22"><circle cx="11" cy="11" r="7" fill="none" stroke="${css("--chain")}" stroke-width="2.2"/></svg>`,
+  kiln: () => `<svg class="g" width="22" height="22"><rect x="5" y="5" width="12" height="12" fill="${css("--s2")}" stroke="${css("--chain")}" stroke-width="2"/></svg>`,
+  product: () => `<svg class="g" width="30" height="10"><line x1="1" y1="5" x2="29" y2="5" stroke="${css("--chain")}" stroke-width="2.5"/></svg>`,
+  rock: () => `<svg class="g" width="30" height="10"><line x1="1" y1="5" x2="29" y2="5" stroke="${css("--rock")}" stroke-width="3" stroke-dasharray="8 5"/></svg>`,
+  co2: () => `<svg class="g" width="30" height="10"><line x1="1" y1="5" x2="29" y2="5" stroke="${css("--co2")}" stroke-width="2.2" stroke-dasharray="5 4"/></svg>`,
+  store: () => `<svg class="g" width="18" height="18"><path d="M9 2l7 7-7 7-7-7z" fill="${css("--co2")}" stroke="${css("--surface")}" stroke-width="1.5"/></svg>`,
+  port: () => `<svg class="g" width="22" height="22"><circle cx="11" cy="11" r="6" fill="${css("--surface")}" stroke="${css("--chain")}" stroke-width="2"/></svg>`,
+  ship: () => `<svg class="g" width="30" height="10"><line x1="1" y1="5" x2="29" y2="5" stroke="${css("--chain")}" stroke-width="1.6" stroke-dasharray="2 4"/></svg>`,
+  sea: () => `<svg class="g" width="22" height="22"><rect x="3" y="4" width="16" height="14" rx="1" fill="${css("--e5")}" stroke="${css("--chain")}" stroke-width="2"/></svg>`,
+  warn: () => `<svg class="g" width="12" height="12" viewBox="0 0 12 12"><path d="M6 1l5 9.5H1z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6 4.5v2.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="6" cy="8.9" r=".75" fill="currentColor"/></svg>`,
+};
+
+// ---- map -----------------------------------------------------------------------------------
+const map = L.map("map", {worldCopyJump: true, preferCanvas: true, minZoom: 2, maxZoom: 10, zoomControl: false}).setView([30, 0], 3);
+L.control.zoom({position: "topleft"}).addTo(map);
+L.control.scale({position: "bottomright", imperial: false}).addTo(map);
+map.attributionControl.setPrefix("").addAttribution("Efficiency: [C]Worthy / Zhou et al. 2025. Land: Natural Earth");
+const renderer = L.canvas({padding: 0.3});
+map.createPane("land"); map.getPane("land").style.zIndex = 410; map.getPane("land").style.pointerEvents = "none";
+map.createPane("chain"); map.getPane("chain").style.zIndex = 440; map.getPane("chain").style.pointerEvents = "none";
+map.createPane("top"); map.getPane("top").style.zIndex = 450;
+const topRenderer = L.canvas({padding: 0.3, pane: "top"});
+const chainRenderer = L.canvas({padding: 0.3, pane: "chain"});
+
+async function load() {
+  const j = f => fetch("data/" + f).then(r => { if (!r.ok) throw new Error(`${f} (${r.status})`); return r.json(); });
+  [meta, ports, storage, polys, land] = await Promise.all([j("meta.json"), j("ports.json"), j("storage.json"),
+    j("eff_polygons.geojson"), j("land.geojson")]);
+  const sEl = $("scen");
+  const short = {default: "Atlas defaults", ship_only: "Ship dispersal only",
+                 pov_chem: "Permissive ocean chemistry", pov_kiln_chem: "Permissive chemistry and vendor kiln cost"};
+  for (const [k, s] of Object.entries(meta.scenarios)) { const o = new Option(short[k] || s.label, k); o.title = s.label; sEl.add(o); }
+  for (const k of Object.keys(meta.scenarios)) D[k] = await j(`scen_${k}.json`);
+  const h = new URLSearchParams(location.hash.slice(1));
+  if (h.get("theme")) document.documentElement.dataset.theme = h.get("theme");
+  if (h.get("scen") && meta.scenarios[h.get("scen")]) sEl.value = h.get("scen");
+  if (h.get("greenfield") === "1") document.querySelector('.kind[value="greenfield"]').checked = true;
+  renderMethod(meta.method);
+  $("about-gen").textContent = `Data generated ${meta.generated}. ${fmt(100 * meta.efficiency.share_below_084)}% of ocean polygons have 15-year efficiency below the 0.84 constant used in the Frontier POV; the median is ${fmt(meta.efficiency.median_e15, 2)}.`;
+  $("loading").remove();
+  redrawAll();
+  if (h.get("methodology")) { about.showModal(); const sec = h.get("methodology");
+    if (sec.startsWith("m-") && $(sec)) $(sec).scrollIntoView({block: "start"}); }
+  if (h.get("sel")) { const s = D[sEl.value], i = s.id.indexOf(h.get("sel"));
+    if (i >= 0) { map.setView([s.lat[i], s.lon[i]], +(h.get("z") || 5), {animate: false}); select(i); } }
+}
+
+// ---- methodology dialog, filled from meta.method (values read from the model's own modules) ----
+function renderMethod(M) {
+  const P = (n, d = 0, scale = 1) => { const p = M.params[n]; return p ? fmt(p.c * scale, d) : "?"; };
+  const U = n => (M.params[n] || {}).u || "";
+  const S = M.scenario, pr = M.products, pur = M.purity, pct = v => fmt(100 * v, 0) + "%";
+  const crf = (r, n) => r * (1 + r) ** n / ((1 + r) ** n - 1);
+  const row = (a, b, c) => `<tr><td>${a}</td><td class="n">${b}</td><td>${c || ""}</td></tr>`;
+  $("m-body").innerHTML = `
+  <h3 id="m-overview">Overview</h3>
+  <p>For each rock source, the model searches every combination of kiln type, kiln site, port, CO₂ storage site and dispersal water, and keeps the chain with the lowest cost per net tonne of CO₂ removed. Net means ocean uptake minus every emission along the chain. Each source is solved on its own: neighbours would compete for the same ports, storage and sea, so costs are not additive. All costs are 2024 USD for an nth-of-a-kind plant producing ${fmt(1)} Mt of oxide a year, built in ${S.year}.</p>
+  <ol><li>Quarry the rock (limestone, dolomite or magnesite).</li>
+      <li>Calcine it in a kiln with CO₂ capture, at the plant or, for greenfield and magnesite sources, at a hub kiln on the coast.</li>
+      <li>Send the captured CO₂ by pipeline, or by liquefied-CO₂ ship from a coastal kiln, to one of the ${S.n_storage} nearest storage sites within ${fmt(S.max_storage_km)} km.</li>
+      <li>Haul the oxide (or the raw rock, for hub kilns) by rail or truck to one of the ${S.n_ports} nearest suitable ports within ${fmt(S.max_port_km)} km.</li>
+      <li>Disperse it at sea from a ship, slaked on board, or from coastal outfalls when the kiln is on the open coast. The alkalinity draws down atmospheric CO₂ according to the ocean efficiency of the water it enters.</li></ol>
+
+  <h3 id="m-eq">Equations</h3>
+  <h4>Net removal per tonne of product</h4>
+  <div class="eq"><var>N</var> = <var>U</var><sub>max</sub> · <var>p</var> · <var>η</var><sub>15</sub> − (1 − <var>c</var>)(<var>E</var><sub>proc</sub><var>p</var> + <var>E</var><sub>fuel</sub>) − <var>E</var><sub>upstream</sub> − <var>E</var><sub>power</sub> − <var>E</var><sub>quarry</sub> − <var>E</var><sub>haul</sub> − <var>E</var><sub>ship</sub></div>
+  <p class="where"><var>U</var><sub>max</sub> = 2 mol CO₂ per mol of divalent cation (${fmt(pr.CaO.max_uptake_tco2_per_t, 3)} t CO₂/t CaO, ${fmt(pr.MgO.max_uptake_tco2_per_t, 3)} per t MgO, ${fmt(pr.dolime.max_uptake_tco2_per_t, 3)} per t dolime); <var>p</var> = feed purity; <var>η</var><sub>15</sub> = modelled ocean efficiency after ${S.horizon_yr} years, averaged over the four release months (Zhou et al. 2025). It already includes the thermodynamic ceiling, so it is never multiplied by a constant such as the POV's 0.84. <var>c</var> = capture rate; <var>E</var><sub>proc</sub> = process CO₂ (${fmt(pr.CaO.process_co2_t_per_t, 3)} t/t CaO); <var>E</var><sub>fuel</sub> = fuel CO₂. Captured CO₂ is stored, not credited: only ocean uptake counts as removal.</p>
+  <h4>Cost per net tonne and the chain choice</h4>
+  <div class="eq"><var>C</var> = (<var>C</var><sub>quarry</sub> + <var>C</var><sub>kiln</sub> + <var>C</var><sub>CO₂</sub> + <var>C</var><sub>haul</sub> + <var>C</var><sub>port</sub> + <var>C</var><sub>disperse</sub> + <var>m</var> <var>N</var>)(1 + <var>w</var>) &nbsp;&nbsp; cost per t product<br>
+    chain* = argmin <var>C</var> / <var>N</var>, &nbsp; solved by iterating chain* = argmin (<var>C</var> − <var>λN</var>), &nbsp; <var>λ</var> ← <var>C</var>/<var>N</var> &nbsp; (Dinkelbach)</div>
+  <p class="where"><var>m</var> = MRV and dispersal operations, $${P("mrv")} + $${P("dispersal_ops_other")} per t CDR; <var>w</var> = working capital, ${pct(M.params.working_capital.c)}. The ratio objective is solved exactly: for a trial cost per tonne <var>λ</var>, each part of the chain is chosen to minimise <var>C</var> − <var>λN</var>, then <var>λ</var> is updated until it stops changing.</p>
+  <h4>Capital recovery</h4>
+  <div class="eq"><var>C</var><sub>capital</sub> = <var>K</var> · CRF / CF, &nbsp;&nbsp; CRF = <var>r</var>(1 + <var>r</var>)<sup><var>n</var></sup> / ((1 + <var>r</var>)<sup><var>n</var></sup> − 1)</div>
+  <p class="where"><var>K</var> = capex per t/yr of capacity; <var>r</var> = ${pct(M.params.wacc.c)} real WACC; <var>n</var> = ${P("life_plant")} years (CRF = ${fmt(crf(M.params.wacc.c, M.params.life_plant.c), 3)}); CF = ${pct(M.params.capacity_factor_kiln.c)} capacity factor.</p>
+  <h4>Ship discharge limit</h4>
+  <div class="eq"><var>r</var> = min( <var>r</var><sub>nominal</sub>, &nbsp;<var>r</var><sub>ref</sub> · ΔTA<sub>allow</sub>(Ω<sup>*</sup>) / ΔTA<sub>ref</sub> · <var>f</var><sub>dilution</sub> )</div>
+  <p class="where"><var>r</var><sub>nominal</sub> = ${fmt(S.rate_nom_kg_s)} kg/s of Ca(OH)₂; <var>r</var><sub>ref</sub> = ${fmt(M.chem.ref_rate)} kg/s and ΔTA<sub>ref</sub> ≈ ${fmt(M.chem.ref_dta)} µmol/kg from Caserini et al. 2021's wake model; ΔTA<sub>allow</sub> is the alkalinity increment that raises aragonite saturation to Ω<sup>*</sup> = ${fmt(S.omega_cap, 1)} for the polygon's surface water that month (PyCO2SYS, control-run chemistry); <var>f</var><sub>dilution</sub> = ${fmt(S.dilution, 0)}. Discharge time then sets ship-days per tonne:</p>
+  <div class="eq"><var>C</var><sub>ship</sub> = [ <var>t</var><sub>port</sub> + 2<var>d</var>/<var>v</var> + <var>m</var><sub>hydrate</sub>/<var>r</var> ] · (charter + operations) / payload + fuel + slaking + retrofit</div>
+  <p class="where"><var>d</var> = sea distance from port to the dispersal polygon (searoute network; no canal transits; at most ${fmt(S.max_transit_km)} km); <var>v</var> = vessel service speed; the fleet class is the cheapest the port can take (Handysize to Capesize by berth depth); the polygon is chosen separately for each release season within the jurisdiction.</p>
+  <h4>Coastal outfalls</h4>
+  <div class="eq"><var>n</var><sub>outfalls</sub> = 10<sup>6</sup> t · <var>U</var><sub>max</sub><var>p</var><var>η</var> / capacity, &nbsp;&nbsp; <var>C</var><sub>outfall</sub> = slaking + slurry · (${fmt(S.outfall_mean_slurry_km)} km + inland km + haul km) + <var>n</var><sub>outfalls</sub>(<var>K</var><sub>o</sub>·CRF + <var>O</var><sub>o</sub>)/10<sup>6</sup> t</div>
+  <p class="where">Capacity ${P("outfall_capacity_dalhousie", 1)} kt CDR/yr per outfall (Dalhousie/Fennel study); outfalls need the kiln on the open coast (port no more than ${fmt(S.outfall_max_inland_km)} km inland); efficiency comes from the adjacent polygon within ${fmt(S.outfall_max_poly_km)} km and is flagged as outside model skill.</p>
+  <h4>CO₂ transport</h4>
+  <div class="eq"><var>C</var><sub>pipe</sub> = ${P("pipe_onshore_ref", 1)} · (<var>L</var>/100 km) · (<var>Q</var>/1 Mt)<sup>−${P("pipe_scale_exponent", 2)}</sup> $/t CO₂ (× offshore multiplier), &nbsp; <var>L</var> = 1.2 × great-circle distance</div>
+  <p class="where">From a coastal kiln the model can instead liquefy the CO₂ and ship it to offshore storage, whichever is cheaper. Storage costs ${"$"}${P("storage_saline_onshore", 2)} (onshore saline), ${"$"}${P("storage_saline_offshore", 2)} (offshore saline) and ${"$"}${P("storage_ism_basalt", 2)} (mineral storage in basalt) per t CO₂ injected.</p>
+
+  <h3 id="m-kiln">How the kiln type is chosen</h3>
+  <p>Four kiln types are evaluated at every candidate site and the one that minimises cost per net tonne for the whole chain wins, so a kiln with lower cost but higher residual emissions can lose to a cleaner one. Gas kilns pay the regional gas price and are debited uncaptured and upstream methane emissions. Electric calciners run on firm clean power priced at the kiln's location: the cheaper of self-built solar, wind and batteries sized for a ${pct(M.params.capacity_factor_kiln.c)} capacity factor, or grid power where the grid is below ${M.clean_grid_threshold_g} g CO₂e/kWh in ${S.year}. They are not offered where no firm clean supply is feasible. Electricity emissions use the supply's lifecycle intensity, never the current grid mix.</p>
+  <table class="mt"><thead><tr><th>Kiln type</th><th>Capex, per t/yr of capacity</th><th>Energy</th><th>Capture rate</th><th>Capture cost</th></tr></thead><tbody>
+    <tr><td>Gas kiln, oxyfuel capture</td><td class="n">$${P("capex_gas_kiln")}</td><td class="n">${P("heat_gas_oxy_CaO", 1)} GJ/t</td><td class="n">${pct(M.params.capture_rate_gas_oxy.c)}</td><td class="n">$${P("capture_cost_gas_oxy")}/t CO₂</td></tr>
+    <tr><td>Gas kiln, post-combustion capture</td><td class="n">$${P("capex_gas_kiln")}</td><td class="n">${P("heat_gas_post_CaO", 1)} GJ/t</td><td class="n">${pct(M.params.capture_rate_gas_post.c)}</td><td class="n">$${P("capture_cost_gas_post")}/t CO₂</td></tr>
+    <tr><td>Indirect electric calciner</td><td class="n">$${P("capex_elec_indirect")}</td><td class="n">${P("elec_heat_elec_indirect_CaO", 2)} MWh/t</td><td class="n">${pct(M.params.capture_rate_elec.c)}</td><td class="n">$${P("capture_cost_elec")}/t CO₂</td></tr>
+    <tr><td>Plasma electric calciner</td><td class="n">$${P("capex_elec_plasma")}</td><td class="n">${P("elec_heat_elec_plasma_CaO", 2)} MWh/t</td><td class="n">${pct(M.params.capture_rate_elec.c)}</td><td class="n">$${P("capture_cost_elec")}/t CO₂</td></tr>
+  </tbody></table>
+  <p class="where">Per tonne of CaO, central NOAK values. Heat demand for dolime and magnesia is scaled from EU BAT ranges; electric calciners capture near-pure process CO₂, so capture is mainly compression. Gas prices: US $${P("gas_price_us", 2)}, Europe $${P("gas_price_europe", 2)}, Asia $${P("gas_price_asia", 2)}, elsewhere $${P("gas_price_middle_east_other", 2)} per MMBtu.</p>
+
+  <h3 id="m-sites">Existing and greenfield sites</h3>
+  <table class="mt"><thead><tr><th></th><th>Existing lime and cement plants</th><th>Producing magnesite mines</th><th>Greenfield limestone, magnesite prospects and closed mines</th></tr></thead><tbody>
+    <tr><td>Kiln site</td><td>Always at the plant: CO₂ goes plant to storage, lime goes plant to port</td><td colspan="2">At the quarry or at a hub kiln on the coast, rock hauled there, whichever is cheaper</td></tr>
+    <tr><td>Feed purity</td><td>${pct(pur.lime)} (lime plants), ${pct(pur.cement)} (cement plants)</td><td>From reported MgO grade, else ${pct(pur.magnesite)}</td><td>Limestone ${pct(pur.greenfield)}, or 92% where GLiM maps pure carbonate; magnesite as left</td></tr>
+    <tr><td>Quarry cost</td><td colspan="3">The same captive-quarry cost everywhere: $${P("quarry_crush_lump")}/t rock crushed (× ${P("quarry_yield_factor", 2)} yield for lump-feed kilns; +$${P("fine_grind_add")}/t fine grinding for electric calciners)</td></tr>
+    <tr><td>Kiln capex</td><td colspan="3">A new CO₂-capture kiln is costed at every site. Existing kilns are not credited, because they would need replacing or retrofitting for capture</td></tr>
+    <tr><td>Permits and risk</td><td>Existing quarry and industrial permits</td><td>Operating mine</td><td>None: flagged "no permits"; greenfield rock quality unknown; drawn as open rings</td></tr>
+  </tbody></table>
+  <p class="where">So the cost difference between an existing plant and a greenfield district comes mainly from purity (more rock per tonne of product, less removal per tonne), and from greenfield sources' freedom to use a coastal hub kiln. Permitting time and risk are not priced.</p>
+
+  <h3 id="m-assume">Major assumptions</h3>
+  <table class="mt"><thead><tr><th>Assumption</th><th>Value</th><th>Note</th></tr></thead><tbody>
+    ${row("Plant scale", "1 Mt oxide/yr", "Sensitivities at 0.2 and 5 Mt/yr planned")}
+    ${row("Maturity and year", `${S.variant}, ${S.year}`, "FOAK and 2030/2050 in the scenario suite")}
+    ${row("Ocean efficiency horizon", `${S.horizon_yr} years`, "Longest simulated; curves still rising, so conservative")}
+    ${row("Saturation limit in the ship wake", `Ω<sub>arag</sub> ≤ ${fmt(S.omega_cap, 1)}`, "Moras et al. 2022; 7 and 12.5 as sensitivities")}
+    ${row("Nominal ship discharge", `${fmt(S.rate_nom_kg_s)} kg/s Ca(OH)₂`, "Capped per polygon by the saturation limit")}
+    ${row("Jurisdiction", S.jurisdiction === "own" ? "Own EEZ" : "Any EEZ", `Polygon counts if the port's country holds ≥ ${pct(S.own_eez_min_frac)} of it or ≥ ${fmt(S.own_eez_min_km2)} km²`)}
+    ${row("Port reach", `≤ ${fmt(S.max_port_km)} km, ${S.n_ports} nearest`, "Great Lakes, Seaway and far-inland river ports excluded")}
+    ${row("Dispersal transit", `≤ ${fmt(S.max_transit_km)} km one way`, "No Panama or Suez transits")}
+    ${row("CO₂ storage reach", `≤ ${fmt(S.max_storage_km)} km, ${S.n_storage} nearest`, "All maturity tiers; mineral storage treated as equivalent")}
+    ${row("Land haul", `rail $${P("rail_rate", 3)}, truck $${P("truck_rate", 2)} per t-km`, `Rail assumed available; quicklime × ${P("quicklime_land_premium", 1)}`)}
+    ${row("Ship charter", `$${P("ship_tc_rate_handysize")} to $${P("ship_tc_rate_capesize")} per day`, `Handysize to Capesize; fuel $${P("vlsfo_price")}/t; discharge at ${P("ship_discharge_speed")} km/h`)}
+    ${row("Port loading", `$${P("port_loading_dues", 2)}/t`, "Plus covered quicklime storage")}
+    ${row("Upstream gas emissions", `${P("upstream_ghg_gas", 1)} g CO₂e/MJ`, "Debited from gas kilns")}
+    ${row("Firm clean power fallback", `$${P("elec_price_clean_firm")}/MWh`, "Only where the clean-power layer has no cell")}
+  </tbody></table>
+
+  <h3 id="m-data">Datasets</h3>
+  <table class="mt"><thead><tr><th>Layer</th><th>Source</th><th>Licence</th></tr></thead><tbody>
+    <tr><td>Ocean efficiency</td><td>[C]Worthy OAE efficiency atlas, Zhou et al. 2025 (690 polygons, CESM ~100 km, 15-year runs)</td><td>ODC-By 1.0</td></tr>
+    <tr><td>Surface chemistry</td><td>[C]Worthy control run, 1999 surface temperature, salinity, alkalinity, DIC</td><td>ODC-By 1.0</td></tr>
+    <tr><td>Lime plants</td><td>EPA GHGRP Subpart S, ECCC GHGRP, EU ETS (captive sugar, pulp and gypsum kilns removed)</td><td>Public / open</td></tr>
+    <tr><td>Cement plants</td><td>Global Energy Monitor, Global Cement and Concrete Tracker</td><td>CC BY 4.0</td></tr>
+    <tr><td>Magnesite</td><td>USGS Mineral Commodity Summaries 2026, Minerals Yearbook, MRDS, national surveys</td><td>Public / various</td></tr>
+    <tr><td>Greenfield limestone</td><td>GLiM carbonate class, Macrostrat (dolomite share), WDPA and urban masks</td><td>Internal only</td></tr>
+    <tr><td>Ports</td><td>NGA World Port Index, IMF PortWatch dry-bulk calls</td><td>Public domain / IMF terms</td></tr>
+    <tr><td>CO₂ storage</td><td>Frontier CO₂ Storage Atlas; IEAGHG/OGCI CO₂ Storage Resource Catalogue</td><td>Internal only (CSRC)</td></tr>
+    <tr><td>Clean power</td><td>Global Solar and Wind Atlases, NASA POWER, IRENA 2026, NREL ATB 2025, Ember, IEA WEO-2024</td><td>CC BY 4.0 / NC</td></tr>
+    <tr><td>Jurisdiction and routing</td><td>Marine Regions World EEZ v12; searoute marine network; Natural Earth</td><td>CC BY 4.0 / open</td></tr>
+    <tr><td>Costs</td><td>EU BAT, CEMCAP, NETL, ZEP, Baltic Exchange, Frontier TEAs (calibration)</td><td>Internal where Frontier</td></tr>
+  </tbody></table>
+
+  <h3 id="m-limits">Main limits</h3>
+  <ul><li>Central estimates only; no uncertainty ranges yet.</li>
+      <li>Sources are optimised independently; shared ports, storage and dispersal water are not rationed, so costs must not be summed.</li>
+      <li>Ocean efficiency is from one ~100 km model with a single release year; coastal values are outside its skill and the Mediterranean, Baltic and Hudson Bay are not covered.</li>
+      <li>The ship discharge limit rests on one wake model and an assumed saturation threshold.</li>
+      <li>Most chains rely on CO₂ storage assessed only at basin level or not yet appraised.</li>
+      <li>Magnesia dissolution, market leakage, permitting time and river alkalinity are not modelled.</li></ul>
+  <h3>Internal to Frontier</h3>
+  <p>Uses Frontier TEA calibration, CO₂ Storage Resource Catalogue sites (OGCI, all rights reserved), GLiM geology (licence unresolved) and WDPA-derived masks (non-commercial). Do not share outside Frontier. Full methods, gates and sources: METHODS.md; open items: TODO.md.</p>
+  <p id="about-gen"></p>`;
+}
+
+function redrawAll() { legend(); drawLand(); drawPolys(); drawSources(); }
+
+function ticks(bins, pre) {
+  const n = bins.length + 1;
+  return bins.map((b, k) => `<span style="left:${(100 * (k + 1) / n).toFixed(2)}%">${pre}${b}</span>`).join("");
+}
+function legend() {
+  $("cost-ramp").innerHTML = [1,2,3,4,5,6,7].map(i => `<span style="background:var(--c${i})"></span>`).join("");
+  $("cost-ticks").innerHTML = ticks(COST_BINS, "$");
+  const key = $("olayer").value;
+  $("ocean-blk").style.display = key === "none" ? "none" : "";
+  if (key === "none") return;
+  $("ocean-title").textContent = OCEAN[key][0];
+  $("ocean-ramp").innerHTML = [1,2,3,4,5,6,7].map(i => `<span style="background:var(--e${i})"></span>`).join("");
+  $("ocean-ticks").innerHTML = ticks(OCEAN[key][1], "");
+}
+
+function drawLand() {
+  if (landLayer) landLayer.remove();
+  landLayer = L.geoJSON(land, {pane: "land", interactive: false,
+    style: {fillColor: css("--land"), fillOpacity: 1, color: css("--border"), weight: 0.6}}).addTo(map);
+}
+
+function drawPolys() {
+  if (polyLayer) polyLayer.remove();
+  const key = $("olayer").value;
+  if (key === "none") return;
+  polyLayer = L.geoJSON(polys, {renderer, style: f => ({
+      fillColor: oColor(key, f.properties[key]), fillOpacity: 0.9, color: css("--sea"), weight: 0.5}),
+    onEachFeature: (f, l) => l.bindTooltip(() => {
+      const p = f.properties;
+      return `<b>Efficiency</b> ${fmt(p.e5, 2)} at 5 yr, ${fmt(p.e10, 2)} at 10, ${fmt(p.e15, 2)} at 15<br>` +
+        `<b>Discharge limit</b> ${fmt(p.r5, 0)} kg/s (Ω ≤ 5), ${fmt(p.r12, 0)} kg/s (Ω ≤ 12.5)<br>` +
+        `<span style="color:var(--ink-3)">Surface ${fmt(p.sst, 1)} °C, aragonite saturation ${fmt(p.om, 1)}</span>`; },
+      {sticky: true, direction: "top", offset: [0, -8]})
+  }).addTo(map);
+}
+
+function visible(s, i) {
+  const kinds = [...document.querySelectorAll(".kind:checked")].map(e => e.value);
+  if (!kinds.includes(s.k[i])) return false;
+  if ($("f-prelim").checked && s.prelim[i]) return false;
+  if ($("f-skill").checked && s.mode[i] !== "ship") return false;
+  return true;
+}
+
+function drawSources() {
+  if (srcLayer) srcLayer.remove();
+  const s = D[$("scen").value];
+  srcLayer = L.layerGroup().addTo(map);
+  // Draw order: greenfield rings first, existing plants and deposits on top; within each, cheapest last.
+  const gf = i => s.permit[i] ? 1 : 0;   // greenfield districts, magnesite prospects and closed mines first
+  const idx = [...s.usd.keys()].filter(i => visible(s, i)).sort((a, b) => gf(a) - gf(b) || s.usd[b] - s.usd[a]);
+  for (const i of idx) {
+    const g = !s.permit[i], col = costColor(s.usd[i]);
+    // Colour = cost, so site status is encoded by fill: operating site = filled dot,
+    // greenfield district, magnesite prospect or closed mine = hollow ring.
+    const m = L.circleMarker([s.lat[i], s.lon[i]], g
+      ? {renderer: topRenderer, pane: "top", radius: 3.4, color: col, weight: 1.7, fill: true, fillOpacity: 0}   // transparent fill keeps the ring clickable
+      : {renderer: topRenderer, pane: "top", radius: 4.6, fillColor: col, fillOpacity: 1, color: css("--surface"), weight: 1.5});
+    m.bindTooltip(`<b>${esc(s.nm[i])}</b><br>$${fmt(s.usd[i])} per net t CO₂, ${s.mode[i] === "ship" ? "ship" : "coastal outfall"}`,
+      {direction: "top", offset: [0, -6]});
+    m.on("click", e => { L.DomEvent.stopPropagation(e); select(i); });
+    srcLayer.addLayer(m);
+  }
+  counts(s); stats(s, idx); list(s, idx);
+  if (selId !== null) { const j = s.id.indexOf(selId);
+    if (j >= 0 && visible(s, j)) select(j, true); else clearSel(); }
+}
+
+function counts(s) {
+  const c = {};
+  s.k.forEach((k, i) => { if (($("f-prelim").checked && s.prelim[i]) || ($("f-skill").checked && s.mode[i] !== "ship")) return;
+    c[k] = (c[k] || 0) + 1; });
+  document.querySelectorAll(".cnt").forEach(e => e.textContent = fmt(c[e.dataset.k] || 0));
+}
+
+function quant(a, q) { const b = a.slice().sort((x, y) => x - y); if (!b.length) return null;
+  const p = (b.length - 1) * q, i = Math.floor(p); return b[i] + (b[Math.min(i + 1, b.length - 1)] - b[i]) * (p - i); }
+function stats(s, idx) {
+  const u = idx.map(i => s.usd[i]), m = meta.scenarios[$("scen").value];
+  $("f-best").textContent = u.length ? "$" + fmt(quant(u, 0)) : "–";
+  $("f-p10").textContent = u.length ? "$" + fmt(quant(u, 0.1)) : "–";
+  $("f-med").textContent = u.length ? "$" + fmt(quant(u, 0.5)) : "–";
+  $("f-n").textContent = u.length ? `${fmt(u.length)} sources shown. Of ${fmt(m.n_sources)} evaluated in this scenario, ${fmt(m.n_sources - m.n_ok)} have no viable chain.`
+                                  : "No sources match these filters.";
+}
+
+function list(s, idx) {
+  const b = map.getBounds(), ul = $("list");
+  const rows = idx.filter(i => b.contains([s.lat[i], s.lon[i]])).sort((a, c) => s.usd[a] - s.usd[c]).slice(0, 12);
+  ul.innerHTML = rows.length ? rows.map(i => `<li data-i="${i}" tabindex="0" role="button" class="${s.id[i] === selId ? "sel" : ""}">
+      <span class="dot" style="${!s.permit[i] ? `background:transparent;box-shadow:inset 0 0 0 2px ${costColor(s.usd[i])}` : `background:${costColor(s.usd[i])}`}"></span>
+      <span class="nm"><b>${esc(s.nm[i])}</b><span>${KIND[s.k[i]]}, ${s.cty[i]}</span></span>
+      <span class="usd num">$${fmt(s.usd[i])}</span></li>`).join("")
+    : `<li class="empty" style="cursor:default">Nothing in view. Zoom out or change the filters.</li>`;
+  ul.querySelectorAll("li[data-i]").forEach(li => { li.onclick = () => { select(+li.dataset.i); closePanelMobile(); };
+    li.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); li.click(); } }; });
+}
+
+// ---- selection -----------------------------------------------------------------------------
+function clearSel() {
+  selId = null;
+  if (chainLayer) { chainLayer.remove(); chainLayer = null; }
+  $("info").style.display = "none";
+  document.querySelectorAll(".list li.sel").forEach(li => li.classList.remove("sel"));
+}
+
+function select(i, keep) {
+  const s = D[$("scen").value];
+  selId = s.id[i];
+  if (chainLayer) chainLayer.remove();
+  chainLayer = L.layerGroup().addTo(map);
+  const P = {pane: "chain", renderer: chainRenderer, interactive: false};
+  const src = [s.lat[i], s.lon[i]], p = ports[s.port[i]], st = storage[s.st[i]];
+  const ink = css("--chain"), hub = s.ks[i] === "port" && p;
+  const kiln = hub ? [p.lat, p.lon] : src;
+  const ps = [...new Set(String(s.poly[i]).split(","))].map(Number);
+  const pf = polys.features.filter(f => ps.includes(f.properties.id));
+  for (const f of pf) {
+    L.geoJSON(f, {...P, style: {fill: false, color: ink, weight: 2.2}}).addTo(chainLayer);
+    if (p && s.mode[i] === "ship") L.polyline([[p.lat, p.lon], [f.properties.lat, f.properties.lon]],
+      {...P, color: ink, weight: 1.6, dashArray: "2 5"}).addTo(chainLayer);
+  }
+  if (st) L.polyline([kiln, [st.lat, st.lon]], {...P, color: css("--co2"), weight: 2.4, dashArray: "6 5"}).addTo(chainLayer);
+  if (p) L.polyline([src, [p.lat, p.lon]], hub ? {...P, color: css("--rock"), weight: 3, dashArray: "9 6"}
+                                               : {...P, color: ink, weight: 2.6}).addTo(chainLayer);
+  if (st) L.marker([st.lat, st.lon], {...P, icon: L.divIcon({className: "", iconSize: [18, 18], html: G.store()})}).addTo(chainLayer);
+  if (p) L.circleMarker([p.lat, p.lon], {...P, radius: 6, color: ink, weight: 2, fillColor: css("--surface"), fillOpacity: 1}).addTo(chainLayer);
+  if (hub) L.marker(kiln, {...P, icon: L.divIcon({className: "", iconSize: [12, 12],
+      html: `<div style="width:12px;height:12px;background:${css("--s2")};border:2px solid ${ink}"></div>`})}).addTo(chainLayer);
+  L.circleMarker(src, {...P, radius: 9, color: ink, weight: 2.5, fill: false}).addTo(chainLayer);
+  detail(s, i, p, st, hub);
+  document.querySelectorAll(".list li[data-i]").forEach(li => li.classList.toggle("sel", +li.dataset.i === i));
+  if (!keep) {   // zoom to the source and its routes, in the part of the map the panel leaves free
+    const pts = [src, kiln];
+    if (p) pts.push([p.lat, p.lon]);
+    if (st) pts.push([st.lat, st.lon]);
+    if (p) for (const f of pf) if (map.distance([p.lat, p.lon], [f.properties.lat, f.properties.lon]) < 8e5) {
+      const bb = L.geoJSON(f).getBounds(); pts.push(bb.getSouthWest(), bb.getNorthEast()); }
+    const narrow = matchMedia("(max-width: 860px)").matches, sz = map.getSize();
+    const padBR = narrow ? [30, Math.round(sz.y * 0.64)] : [390, 40], padTL = narrow ? [30, 30] : [60, 40];
+    map.flyToBounds(L.latLngBounds(pts), {paddingTopLeft: padTL, paddingBottomRight: padBR, maxZoom: 8,
+                                          duration: reduced ? 0 : 0.6, animate: !reduced});
+  }
+}
+
+function detail(s, i, p, st, hub) {
+  const c = s.c[i], tot = s.usd[i];
+  const parts = COMP.map(([l, ix], k) => [l, ix.reduce((a, j) => a + (c[j] || 0), 0), `--s${k + 1}`]);
+  const sum = parts.reduce((a, x) => a + x[1], 0) || 1;
+  const prod = PRODUCT[s.pr[i]] || s.pr[i];
+  const tier = String(s.tier[i]).replace(/_/g, " ");
+  const flags = [];
+  if (s.prelim[i]) flags.push(st && String(st.mech).startsWith("ISM") ? "Mineral CO₂ storage (basalt or peridotite) is early-stage"
+    : tier === "basin only" ? "CO₂ storage is a basin-level estimate, not a site"
+    : "CO₂ storage site is assessed but not yet appraised or permitted");
+  if (s.skill[i]) flags.push("Coastal outfall: ocean efficiency outside model skill");
+  if (s.k[i] === "greenfield") flags.push("Greenfield: no permits, rock quality unknown");
+  else if (s.ss[i] === "prospect") flags.push("Magnesite prospect: not yet mined, no permits");
+  else if (s.ss[i] === "past") flags.push("Closed mine: would need reopening and new permits");
+  if (s.pr[i] === "MgO") flags.push("Magnesia dissolution not modelled");
+  if (s.conf[i] === "low") flags.push("Low-confidence geology");
+  const site = s.k[i] === "greenfield" || s.k[i] === "magnesite" ? "quarry" : "plant";
+  const steps = [
+    [G.ring(), hub ? "Quarry" : "Quarry and kiln",
+     hub ? "Rock is quarried here and calcined at the port" : `${ARCH[s.arch[i]]} at the ${site}`],
+    [hub ? G.rock() : G.product(), hub ? "Rock haul to the port" : "Lime haul to the port",
+     `${fmt(s.lkm[i])} km by rail or truck`],
+    ...(hub ? [[G.kiln(), "Hub kiln at the port", ARCH[s.arch[i]]]] : []),
+    [G.co2(), "CO₂ to storage", `${fmt(s.stkm[i])} km by ${String(s.stm[i]).replace("lco2_ship", "liquefied-CO₂ ship")} from the kiln`],
+    [G.store(), "CO₂ storage", `${st ? esc(st.n.replace(/_ /g, " ")) : "–"} (${tier})`],
+    [G.port(), "Port", p ? esc(p.n) : "–"],
+    s.mode[i] === "ship"
+      ? [G.ship(), "Ship dispersal", `${s.cls[i][0].toUpperCase() + s.cls[i].slice(1)} fleet, ${fmt(s.tkm[i])} km to the dispersal area (outlined), discharging ${fmt(s.rate[i], 0)} kg/s`]
+      : [G.sea(), "Coastal outfalls", "Slaked lime piped to outfalls along the nearby coast (water outlined)"]];
+  $("info").style.display = "block";
+  $("info-body").innerHTML = `
+    <h3>${esc(s.nm[i])}</h3>
+    <div class="meta">${STATUS[s.ss[i]] || KIND[s.k[i]]} in ${s.cty[i]}, making ${prod}</div>
+    <div class="cost"><b class="num">$${fmt(tot)}</b><span>per net tonne CO₂</span></div>
+    <div class="kv">
+      <div><b class="num">${fmt(s.net[i], 2)} t</b><span>net CO₂ removed per t ${s.pr[i]}</span></div>
+      <div><b class="num">${fmt(s.eta[i], 2)}</b><span>ocean efficiency at 15 years</span></div></div>
+    <h4>Where the cost comes from</h4>
+    <div class="bar" role="img" aria-label="Cost breakdown">${parts.filter(x => x[1] > 0.05).map(([l, v, col]) =>
+      `<span title="${l}: $${fmt(v)}" style="flex:${v};background:var(${col})"></span>`).join("")}</div>
+    <table class="brk num">${parts.map(([l, v, col]) => `<tr><td><span class="sw" style="background:var(${col})"></span>${l}</td>
+      <td class="r">$${fmt(v)}</td><td class="p">${fmt(100 * v / sum)}%</td></tr>`).join("")}</table>
+    <p class="note">Weakest link compared with the best sites: ${WEAK[s.lf[i]] || s.lf[i]}.</p>
+    <h4>The chain</h4>
+    <ol class="steps">${steps.map(([g, t, d]) => `<li><span class="gl">${g}</span><span><b>${t}</b><span>${d}</span></span></li>`).join("")}</ol>
+    ${flags.length ? `<h4>Caveats</h4><div class="flags">${flags.map(f => `<span class="flag">${G.warn()}${f}</span>`).join("")}</div>` : ""}`;
+}
+
+// ---- controls ------------------------------------------------------------------------------
+$("scen").onchange = drawSources;
+$("olayer").onchange = () => { legend(); drawPolys(); };
+document.querySelectorAll(".kind, #f-prelim, #f-skill").forEach(e => e.onchange = drawSources);
+$("info-close").onclick = clearSel;
+map.on("click", clearSel);   // source clicks stop propagation, so this only fires on empty map
+map.on("moveend", () => { const s = D[$("scen").value];
+  if (s) list(s, [...s.usd.keys()].filter(i => visible(s, i))); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("about").open) clearSel(); });
+$("theme").onclick = () => {
+  const r = document.documentElement, dark = matchMedia("(prefers-color-scheme: dark)").matches;
+  r.dataset.theme = (r.dataset.theme || (dark ? "dark" : "light")) === "dark" ? "light" : "dark";
+  redrawAll(); };
+const about = $("about");
+$("about-btn").onclick = $("internal").onclick = () => about.showModal();
+$("about-close").onclick = () => about.close();
+about.querySelectorAll(".toc a").forEach(a => a.onclick = e => { e.preventDefault();
+  about.querySelector(a.getAttribute("href")).scrollIntoView({behavior: reduced ? "auto" : "smooth", block: "start"}); });
+about.addEventListener("click", e => { if (e.target === about) about.close(); });
+function closePanelMobile() { $("panel").classList.remove("open"); $("menu").setAttribute("aria-expanded", "false"); }
+$("menu").onclick = () => { const o = $("panel").classList.toggle("open"); $("menu").setAttribute("aria-expanded", String(o)); };
+$("legend-toggle").onclick = () => { $("legend").classList.remove("hide"); $("legend-toggle").classList.remove("show"); };
+if (matchMedia("(max-width: 860px)").matches) { $("legend").classList.add("hide"); $("legend-toggle").classList.add("show");
+  $("legend").addEventListener("click", () => { $("legend").classList.add("hide"); $("legend-toggle").classList.add("show"); }); }
+
+// ---- self-test (only with #selftest=1): real mouse events at pixel positions ---------------
+async function selftest() {
+  const out = [], wait = ms => new Promise(r => setTimeout(r, ms));
+  const s = D[$("scen").value];
+  map.setView([50, 5], 5, {animate: false}); await wait(600);
+  const inView = [...s.id.keys()].filter(i => s.k[i] === "lime_plant" && visible(s, i) && map.getBounds().pad(-0.15).contains([s.lat[i], s.lon[i]]));
+  const clickAt = ll => { const pt = map.latLngToContainerPoint(ll), r = map.getContainer().getBoundingClientRect();
+    const x = r.left + pt.x, y = r.top + pt.y, el = document.elementFromPoint(x, y);
+    for (const t of ["mousedown", "mouseup", "click"])
+      el.dispatchEvent(new MouseEvent(t, {bubbles: true, cancelable: true, clientX: x, clientY: y, view: window}));
+  };
+  const a = inView[0];
+  clickAt([s.lat[a], s.lon[a]]); await wait(1000);
+  out.push(`1 click lime plant: selected=${selId === s.id[a]} panel=${$("info").style.display}`);
+  const sz = map.getSize(), onScreen = i => { const q = map.latLngToContainerPoint([s.lat[i], s.lon[i]]);
+    return q.x > 300 && q.y > 40 && q.x < sz.x - 400 && q.y < sz.y - 40; };
+  const b = [...s.id.keys()].find(i => i !== a && visible(s, i) && onScreen(i) &&
+    map.latLngToContainerPoint([s.lat[i], s.lon[i]]).distanceTo(map.latLngToContainerPoint([s.lat[a], s.lon[a]])) > 30);
+  clickAt([s.lat[b], s.lon[b]]); await wait(1000);
+  out.push(`2 click another source: selected=${b !== undefined && selId === s.id[b]}`);
+  const r = $("legend").getBoundingClientRect(), mr = map.getContainer().getBoundingClientRect();
+  clickAt(map.containerPointToLatLng([r.right - mr.left + 40, mr.height - 60])); await wait(400);
+  out.push(`3 click empty map: cleared=${selId === null} panel=${$("info").style.display}`);
+  clickAt([s.lat[a], s.lon[a]]); await wait(300);
+  document.dispatchEvent(new KeyboardEvent("keydown", {key: "Escape"})); await wait(200);
+  out.push(`4 reselect + Esc: cleared=${selId === null}`);
+  clickAt([s.lat[a], s.lon[a]]); await wait(400);
+  $("scen").value = "ship_only"; $("scen").onchange(); await wait(500);
+  const s2 = D.ship_only, j = s2.id.indexOf(selId);
+  out.push(`5 scenario switch keeps same source: ${selId === s.id[a] ? "same id" : "cleared"}; name matches=${j >= 0 && s2.nm[j] === s.nm[a]}`);
+  const pre = document.createElement("pre"); pre.id = "selftest"; pre.textContent = out.join("\n");
+  document.body.appendChild(pre);
+}
+load().then(() => { if (new URLSearchParams(location.hash.slice(1)).get("selftest") === "1") return selftest(); })
+  .catch(e => { const l = $("loading"); if (l) l.textContent = `The map data did not load (${e.message}). Run scripts/export_viewer.py, then reload.`; });
+</script>
+</body>
+</html>
