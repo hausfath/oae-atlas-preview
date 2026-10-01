@@ -3,41 +3,41 @@
   "default": {
    "label": "Atlas defaults (Ω≤5, Caserini dilution, 25 kg/s, own EEZ, ship or outfall)",
    "n_sources": 9220,
-   "n_ok": 4716,
+   "n_ok": 4814,
    "status": {
-    "ok": 4716,
+    "ok": 4814,
     "no_port_within_reach": 3210,
-    "no_viable_chain": 1294
+    "no_viable_chain": 1196
    },
-   "best": 179.2,
-   "p10": 220.0,
-   "median": 268.0,
-   "ship_share": 0.466,
-   "prelim_storage_share": 0.821,
+   "best": 166.2,
+   "p10": 212.3,
+   "median": 256.5,
+   "ship_share": 0.469,
+   "prelim_storage_share": 0.926,
    "by_kind": [
     {
      "kind": "cement_plant",
-     "count": 1547,
-     "min": 191.1,
-     "median": 324.2
+     "count": 1565,
+     "min": 178.7,
+     "median": 318.9
     },
     {
      "kind": "greenfield",
-     "count": 2959,
-     "min": 183.1,
-     "median": 251.9
+     "count": 3039,
+     "min": 176.5,
+     "median": 242.7
     },
     {
      "kind": "lime_plant",
      "count": 187,
-     "min": 185.8,
-     "median": 241.2
+     "min": 174.5,
+     "median": 233.9
     },
     {
      "kind": "magnesite",
      "count": 23,
-     "min": 179.2,
-     "median": 214.5
+     "min": 166.2,
+     "median": 205.0
     }
    ],
    "scenario": {
@@ -68,6 +68,14 @@
     "n_ports": 25,
     "max_storage_km": 1500.0,
     "n_storage": 12,
+    "firm_tiers_always": [
+     "operational",
+     "construction",
+     "permitted"
+    ],
+    "offshore_tieback_km": 100.0,
+    "storage_infield_km": 10.0,
+    "lco2_onshore_max_coast_km": 50.0,
     "clean_power_mode": "continuous",
     "clean_power_storage_set": "battery",
     "sources": [
@@ -90,41 +98,41 @@
   "ship_only": {
    "label": "Ship dispersal only (no coastal outfalls)",
    "n_sources": 9220,
-   "n_ok": 4710,
+   "n_ok": 4808,
    "status": {
-    "ok": 4710,
+    "ok": 4808,
     "no_port_within_reach": 3210,
-    "no_viable_chain": 1300
+    "no_viable_chain": 1202
    },
    "best": 189.2,
-   "p10": 244.4,
-   "median": 321.5,
+   "p10": 236.5,
+   "median": 314.4,
    "ship_share": 1.0,
-   "prelim_storage_share": 0.844,
+   "prelim_storage_share": 0.945,
    "by_kind": [
     {
      "kind": "cement_plant",
-     "count": 1547,
+     "count": 1565,
      "min": 204.1,
-     "median": 328.5
+     "median": 323.9
     },
     {
      "kind": "greenfield",
-     "count": 2953,
-     "min": 197.9,
-     "median": 322.7
+     "count": 3033,
+     "min": 193.0,
+     "median": 314.3
     },
     {
      "kind": "lime_plant",
      "count": 187,
      "min": 189.2,
-     "median": 243.2
+     "median": 241.0
     },
     {
      "kind": "magnesite",
      "count": 23,
-     "min": 224.2,
-     "median": 264.1
+     "min": 212.6,
+     "median": 260.4
     }
    ],
    "scenario": {
@@ -155,6 +163,14 @@
     "n_ports": 25,
     "max_storage_km": 1500.0,
     "n_storage": 12,
+    "firm_tiers_always": [
+     "operational",
+     "construction",
+     "permitted"
+    ],
+    "offshore_tieback_km": 100.0,
+    "storage_infield_km": 10.0,
+    "lco2_onshore_max_coast_km": 50.0,
     "clean_power_mode": "continuous",
     "clean_power_storage_set": "battery",
     "sources": [
@@ -176,41 +192,41 @@
   "pov_chem": {
    "label": "Permissive ocean side (Ω≤12.5, 10× dilution, 100 kg/s, any EEZ)",
    "n_sources": 9220,
-   "n_ok": 5778,
+   "n_ok": 5877,
    "status": {
-    "ok": 5778,
+    "ok": 5877,
     "no_port_within_reach": 3210,
-    "no_viable_chain": 232
+    "no_viable_chain": 133
    },
-   "best": 162.4,
-   "p10": 192.8,
-   "median": 225.8,
+   "best": 157.8,
+   "p10": 185.7,
+   "median": 216.5,
    "ship_share": 1.0,
-   "prelim_storage_share": 0.852,
+   "prelim_storage_share": 0.936,
    "by_kind": [
     {
      "kind": "cement_plant",
-     "count": 1787,
-     "min": 171.8,
-     "median": 236.9
+     "count": 1805,
+     "min": 167.4,
+     "median": 228.4
     },
     {
      "kind": "greenfield",
-     "count": 3653,
-     "min": 163.9,
-     "median": 223.1
+     "count": 3734,
+     "min": 157.8,
+     "median": 214.5
     },
     {
      "kind": "lime_plant",
      "count": 283,
-     "min": 162.4,
-     "median": 194.2
+     "min": 160.6,
+     "median": 189.6
     },
     {
      "kind": "magnesite",
      "count": 55,
-     "min": 168.4,
-     "median": 212.6
+     "min": 161.4,
+     "median": 206.9
     }
    ],
    "scenario": {
@@ -241,6 +257,14 @@
     "n_ports": 25,
     "max_storage_km": 1500.0,
     "n_storage": 12,
+    "firm_tiers_always": [
+     "operational",
+     "construction",
+     "permitted"
+    ],
+    "offshore_tieback_km": 100.0,
+    "storage_infield_km": 10.0,
+    "lco2_onshore_max_coast_km": 50.0,
     "clean_power_mode": "continuous",
     "clean_power_storage_set": "battery",
     "sources": [
@@ -263,41 +287,41 @@
   "pov_kiln_chem": {
    "label": "Permissive ocean side + $56/tCaO calcination (vendor claim)",
    "n_sources": 9220,
-   "n_ok": 5778,
+   "n_ok": 5877,
    "status": {
-    "ok": 5778,
+    "ok": 5877,
     "no_port_within_reach": 3210,
-    "no_viable_chain": 232
+    "no_viable_chain": 133
    },
-   "best": 112.6,
-   "p10": 143.6,
-   "median": 175.3,
+   "best": 106.9,
+   "p10": 138.9,
+   "median": 167.5,
    "ship_share": 1.0,
-   "prelim_storage_share": 0.842,
+   "prelim_storage_share": 0.932,
    "by_kind": [
     {
      "kind": "cement_plant",
-     "count": 1787,
-     "min": 127.6,
-     "median": 181.3
+     "count": 1805,
+     "min": 126.1,
+     "median": 172.7
     },
     {
      "kind": "greenfield",
-     "count": 3653,
-     "min": 118.4,
-     "median": 175.4
+     "count": 3734,
+     "min": 106.9,
+     "median": 167.8
     },
     {
      "kind": "lime_plant",
      "count": 283,
-     "min": 112.6,
-     "median": 140.0
+     "min": 107.8,
+     "median": 133.7
     },
     {
      "kind": "magnesite",
      "count": 55,
-     "min": 124.0,
-     "median": 157.8
+     "min": 122.7,
+     "median": 153.0
     }
    ],
    "scenario": {
@@ -328,6 +352,14 @@
     "n_ports": 25,
     "max_storage_km": 1500.0,
     "n_storage": 12,
+    "firm_tiers_always": [
+     "operational",
+     "construction",
+     "permitted"
+    ],
+    "offshore_tieback_km": 100.0,
+    "storage_infield_km": 10.0,
+    "lco2_onshore_max_coast_km": 50.0,
     "clean_power_mode": "continuous",
     "clean_power_storage_set": "battery",
     "sources": [
@@ -348,7 +380,7 @@
    }
   }
  },
- "generated": "2026-09-23 17:12",
+ "generated": "2026-09-29 17:47",
  "efficiency": {
   "median_e15": 0.774,
   "p10_e15": 0.673,
@@ -703,6 +735,14 @@
    "n_ports": 25,
    "max_storage_km": 1500.0,
    "n_storage": 12,
+   "firm_tiers_always": [
+    "operational",
+    "construction",
+    "permitted"
+   ],
+   "offshore_tieback_km": 100.0,
+   "storage_infield_km": 10.0,
+   "lco2_onshore_max_coast_km": 50.0,
    "clean_power_mode": "continuous",
    "clean_power_storage_set": "battery",
    "sources": [

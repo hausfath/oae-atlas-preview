@@ -378,7 +378,7 @@ function renderMethod(M) {
   <p class="where">Capacity ${P("outfall_capacity_dalhousie", 1)} kt CDR/yr per outfall (Dalhousie/Fennel study); outfalls need the kiln on the open coast (port no more than ${fmt(S.outfall_max_inland_km)} km inland); efficiency comes from the adjacent polygon within ${fmt(S.outfall_max_poly_km)} km and is flagged as outside model skill.</p>
   <h4>CO₂ transport</h4>
   <div class="eq"><var>C</var><sub>pipe</sub> = ${P("pipe_onshore_ref", 1)} · (<var>L</var>/100 km) · (<var>Q</var>/1 Mt)<sup>−${P("pipe_scale_exponent", 2)}</sup> $/t CO₂ (× offshore multiplier), &nbsp; <var>L</var> = 1.2 × great-circle distance</div>
-  <p class="where">From a coastal kiln the model can instead liquefy the CO₂ and ship it to offshore storage, whichever is cheaper. Storage costs ${"$"}${P("storage_saline_onshore", 2)} (onshore saline), ${"$"}${P("storage_saline_offshore", 2)} (offshore saline) and ${"$"}${P("storage_ism_basalt", 2)} (mineral storage in basalt) per t CO₂ injected.</p>
+  <p class="where">The offshore multiplier applies only to the share of the route over sea. Kilns within ${fmt(S.quarry_coastal_km)} km of a port can instead liquefy the CO₂ and ship it along sea routes to offshore storage or to onshore sites within ${fmt(S.lco2_onshore_max_coast_km)} km of the coast, whichever is cheaper. The storage search covers the ${S.n_storage} nearest sites plus every operating, under-construction or permitted site within ${fmt(S.max_storage_km)} km. For storage basins and formations mapped as polygons, new wells can go anywhere inside: CO₂ is piped to the nearest edge, or, when the kiln already sits inside, to wells on site through a ${fmt(S.storage_infield_km)} km in-field line. Storage costs ${"$"}${P("storage_saline_onshore", 2)} (onshore saline), ${"$"}${P("storage_saline_offshore", 2)} (offshore saline) and ${"$"}${P("storage_ism_basalt", 2)} (mineral storage in basalt) per t CO₂ injected.</p>
 
   <h3 id="m-kiln">How the kiln type is chosen</h3>
   <p>Four kiln types are evaluated at every candidate site and the one that minimises cost per net tonne for the whole chain wins, so a kiln with lower cost but higher residual emissions can lose to a cleaner one. Gas kilns pay the regional gas price and are debited uncaptured and upstream methane emissions. Electric calciners run on firm clean power priced at the kiln's location: the cheaper of self-built solar, wind and batteries sized for a ${pct(M.params.capacity_factor_kiln.c)} capacity factor, or grid power where the grid is below ${M.clean_grid_threshold_g} g CO₂e/kWh in ${S.year}. They are not offered where no firm clean supply is feasible. Electricity emissions use the supply's lifecycle intensity, never the current grid mix.</p>
@@ -569,10 +569,13 @@ function select(i, keep) {
     if (p && s.mode[i] === "ship") L.polyline([[p.lat, p.lon], [f.properties.lat, f.properties.lon]],
       {...P, color: ink, weight: 1.6, dashArray: "2 5"}).addTo(chainLayer);
   }
-  if (st) L.polyline([kiln, [st.lat, st.lon]], {...P, color: css("--co2"), weight: 2.4, dashArray: "6 5"}).addTo(chainLayer);
+  // CO2 goes to the routed target: a site, the nearest edge of a storage basin, or wells at the kiln
+  const atKiln = s.stm[i] === "wells_at_kiln";
+  const stPt = s.stx && s.stx[i] != null ? [s.sty[i], s.stx[i]] : (st ? [st.lat, st.lon] : null);
+  if (stPt && !atKiln) L.polyline([kiln, stPt], {...P, color: css("--co2"), weight: 2.4, dashArray: "6 5"}).addTo(chainLayer);
   if (p) L.polyline([src, [p.lat, p.lon]], hub ? {...P, color: css("--rock"), weight: 3, dashArray: "9 6"}
                                                : {...P, color: ink, weight: 2.6}).addTo(chainLayer);
-  if (st) L.marker([st.lat, st.lon], {...P, icon: L.divIcon({className: "", iconSize: [18, 18], html: G.store()})}).addTo(chainLayer);
+  if (stPt) L.marker(atKiln ? kiln : stPt, {...P, icon: L.divIcon({className: "", iconSize: [18, 18], html: G.store()})}).addTo(chainLayer);
   if (p) L.circleMarker([p.lat, p.lon], {...P, radius: 6, color: ink, weight: 2, fillColor: css("--surface"), fillOpacity: 1}).addTo(chainLayer);
   if (hub) L.marker(kiln, {...P, icon: L.divIcon({className: "", iconSize: [12, 12],
       html: `<div style="width:12px;height:12px;background:${css("--s2")};border:2px solid ${ink}"></div>`})}).addTo(chainLayer);
@@ -582,7 +585,7 @@ function select(i, keep) {
   if (!keep) {   // zoom to the source and its routes, in the part of the map the panel leaves free
     const pts = [src, kiln];
     if (p) pts.push([p.lat, p.lon]);
-    if (st) pts.push([st.lat, st.lon]);
+    if (stPt) pts.push(stPt);
     if (p) for (const f of pf) if (map.distance([p.lat, p.lon], [f.properties.lat, f.properties.lon]) < 8e5) {
       const bb = L.geoJSON(f).getBounds(); pts.push(bb.getSouthWest(), bb.getNorthEast()); }
     const narrow = matchMedia("(max-width: 860px)").matches, sz = map.getSize();
@@ -615,7 +618,8 @@ function detail(s, i, p, st, hub) {
     [hub ? G.rock() : G.product(), hub ? "Rock haul to the port" : "Lime haul to the port",
      `${fmt(s.lkm[i])} km by rail or truck`],
     ...(hub ? [[G.kiln(), "Hub kiln at the port", ARCH[s.arch[i]]]] : []),
-    [G.co2(), "CO₂ to storage", `${fmt(s.stkm[i])} km by ${String(s.stm[i]).replace("lco2_ship", "liquefied-CO₂ ship")} from the kiln`],
+    [G.co2(), "CO₂ to storage", s.stm[i] === "wells_at_kiln" ? "New injection wells at the kiln, which sits inside the storage basin"
+      : `${fmt(s.stkm[i])} km by ${String(s.stm[i]).replace("lco2_ship", "liquefied-CO₂ ship")} from the kiln${s.stx && s.stx[i] != null && st && Math.abs(s.stx[i] - st.lon) + Math.abs(s.sty[i] - st.lat) > 0.01 ? ", to the nearest edge of the basin" : ""}`],
     [G.store(), "CO₂ storage", `${st ? esc(st.n.replace(/_ /g, " ")) : "–"} (${tier})`],
     [G.port(), "Port", p ? esc(p.n) : "–"],
     s.mode[i] === "ship"
