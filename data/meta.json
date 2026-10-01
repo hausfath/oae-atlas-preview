@@ -1,7 +1,7 @@
 {
  "scenarios": {
   "default": {
-   "label": "Atlas defaults (Ω≤5, Caserini dilution, 25 kg/s, own EEZ, ship or outfall)",
+   "label": "Atlas defaults (wake cap Ω≤10, discharge manifold, own EEZ, ship or outfall)",
    "n_sources": 9220,
    "n_ok": 4814,
    "status": {
@@ -10,28 +10,28 @@
     "no_viable_chain": 1196
    },
    "best": 166.2,
-   "p10": 212.3,
-   "median": 256.5,
-   "ship_share": 0.469,
+   "p10": 214.7,
+   "median": 261.0,
+   "ship_share": 0.429,
    "prelim_storage_share": 0.926,
    "by_kind": [
     {
      "kind": "cement_plant",
      "count": 1565,
      "min": 178.7,
-     "median": 318.9
+     "median": 318.1
     },
     {
      "kind": "greenfield",
      "count": 3039,
      "min": 176.5,
-     "median": 242.7
+     "median": 243.7
     },
     {
      "kind": "lime_plant",
      "count": 187,
      "min": 174.5,
-     "median": 233.9
+     "median": 256.2
     },
     {
      "kind": "magnesite",
@@ -46,7 +46,11 @@
     "variant": "NOAK",
     "which": "central",
     "horizon_yr": 15,
-    "omega_cap": 5.0,
+    "cap_model": "wake",
+    "omega_cap": 10.0,
+    "injection": "manifold",
+    "k1_override": -1.0,
+    "r_eng_kg_s": -1.0,
     "dilution": 1.0,
     "rate_nom_kg_s": 25.0,
     "jurisdiction": "own",
@@ -104,35 +108,35 @@
     "no_port_within_reach": 3210,
     "no_viable_chain": 1202
    },
-   "best": 189.2,
-   "p10": 236.5,
-   "median": 314.4,
+   "best": 204.1,
+   "p10": 253.9,
+   "median": 308.5,
    "ship_share": 1.0,
-   "prelim_storage_share": 0.945,
+   "prelim_storage_share": 0.947,
    "by_kind": [
     {
      "kind": "cement_plant",
      "count": 1565,
-     "min": 204.1,
-     "median": 323.9
+     "min": 217.5,
+     "median": 321.2
     },
     {
      "kind": "greenfield",
      "count": 3033,
-     "min": 193.0,
-     "median": 314.3
+     "min": 204.1,
+     "median": 306.5
     },
     {
      "kind": "lime_plant",
      "count": 187,
-     "min": 189.2,
-     "median": 241.0
+     "min": 207.3,
+     "median": 257.5
     },
     {
      "kind": "magnesite",
      "count": 23,
-     "min": 212.6,
-     "median": 260.4
+     "min": 233.3,
+     "median": 286.2
     }
    ],
    "scenario": {
@@ -141,7 +145,11 @@
     "variant": "NOAK",
     "which": "central",
     "horizon_yr": 15,
-    "omega_cap": 5.0,
+    "cap_model": "wake",
+    "omega_cap": 10.0,
+    "injection": "manifold",
+    "k1_override": -1.0,
+    "r_eng_kg_s": -1.0,
     "dilution": 1.0,
     "rate_nom_kg_s": 25.0,
     "jurisdiction": "own",
@@ -190,7 +198,7 @@
    }
   },
   "pov_chem": {
-   "label": "Permissive ocean side (Ω≤12.5, 10× dilution, 100 kg/s, any EEZ)",
+   "label": "Permissive ocean side (Ω≤16, wide spreading, 100 kg/s per ship, any EEZ)",
    "n_sources": 9220,
    "n_ok": 5877,
    "status": {
@@ -198,35 +206,35 @@
     "no_port_within_reach": 3210,
     "no_viable_chain": 133
    },
-   "best": 157.8,
-   "p10": 185.7,
-   "median": 216.5,
+   "best": 158.8,
+   "p10": 187.8,
+   "median": 219.1,
    "ship_share": 1.0,
    "prelim_storage_share": 0.936,
    "by_kind": [
     {
      "kind": "cement_plant",
      "count": 1805,
-     "min": 167.4,
-     "median": 228.4
+     "min": 170.0,
+     "median": 231.2
     },
     {
      "kind": "greenfield",
      "count": 3734,
-     "min": 157.8,
-     "median": 214.5
+     "min": 158.8,
+     "median": 217.2
     },
     {
      "kind": "lime_plant",
      "count": 283,
-     "min": 160.6,
-     "median": 189.6
+     "min": 161.8,
+     "median": 190.7
     },
     {
      "kind": "magnesite",
      "count": 55,
-     "min": 161.4,
-     "median": 206.9
+     "min": 163.4,
+     "median": 209.3
     }
    ],
    "scenario": {
@@ -235,9 +243,13 @@
     "variant": "NOAK",
     "which": "central",
     "horizon_yr": 15,
-    "omega_cap": 12.5,
-    "dilution": 10.0,
-    "rate_nom_kg_s": 100.0,
+    "cap_model": "wake",
+    "omega_cap": 16.0,
+    "injection": "wide",
+    "k1_override": -1.0,
+    "r_eng_kg_s": 100.0,
+    "dilution": 1.0,
+    "rate_nom_kg_s": 25.0,
     "jurisdiction": "any",
     "own_eez_min_frac": 0.5,
     "own_eez_min_km2": 10000.0,
@@ -293,35 +305,35 @@
     "no_port_within_reach": 3210,
     "no_viable_chain": 133
    },
-   "best": 106.9,
-   "p10": 138.9,
-   "median": 167.5,
+   "best": 107.8,
+   "p10": 141.1,
+   "median": 169.9,
    "ship_share": 1.0,
-   "prelim_storage_share": 0.932,
+   "prelim_storage_share": 0.933,
    "by_kind": [
     {
      "kind": "cement_plant",
      "count": 1805,
-     "min": 126.1,
-     "median": 172.7
+     "min": 127.2,
+     "median": 175.0
     },
     {
      "kind": "greenfield",
      "count": 3734,
-     "min": 106.9,
-     "median": 167.8
+     "min": 107.8,
+     "median": 170.2
     },
     {
      "kind": "lime_plant",
      "count": 283,
-     "min": 107.8,
-     "median": 133.7
+     "min": 109.4,
+     "median": 134.7
     },
     {
      "kind": "magnesite",
      "count": 55,
-     "min": 122.7,
-     "median": 153.0
+     "min": 126.2,
+     "median": 155.1
     }
    ],
    "scenario": {
@@ -330,9 +342,13 @@
     "variant": "NOAK",
     "which": "central",
     "horizon_yr": 15,
-    "omega_cap": 12.5,
-    "dilution": 10.0,
-    "rate_nom_kg_s": 100.0,
+    "cap_model": "wake",
+    "omega_cap": 16.0,
+    "injection": "wide",
+    "k1_override": -1.0,
+    "r_eng_kg_s": 100.0,
+    "dilution": 1.0,
+    "rate_nom_kg_s": 25.0,
     "jurisdiction": "any",
     "own_eez_min_frac": 0.5,
     "own_eez_min_km2": 10000.0,
@@ -380,14 +396,14 @@
    }
   }
  },
- "generated": "2026-09-29 17:47",
+ "generated": "2026-10-01 13:54",
  "efficiency": {
   "median_e15": 0.774,
   "p10_e15": 0.673,
   "p90_e15": 0.812,
   "share_below_084": 0.97,
-  "median_rmax5": 12.9,
-  "share_rmax5_below_25": 0.745
+  "median_rate_handysize": 10.1,
+  "median_rate_capesize": 26.3
  },
  "method": {
   "params": {
@@ -657,6 +673,48 @@
     "u": "$/t",
     "st": "UNVERIFIED"
    },
+   "ship_discharge_max": {
+    "c": 50.0,
+    "lo": 25.0,
+    "hi": 100.0,
+    "u": "kg/s Ca(OH)2 per ship",
+    "st": "judgement"
+   },
+   "ship_manifold_capex": {
+    "c": 1500000.0,
+    "lo": 500000.0,
+    "hi": 4000000.0,
+    "u": "$ per ship",
+    "st": "judgement"
+   },
+   "ship_beam_handysize": {
+    "c": 30.0,
+    "lo": 28.5,
+    "hi": 31.5,
+    "u": "m",
+    "st": "UNVERIFIED"
+   },
+   "ship_draught_handysize": {
+    "c": 10.5,
+    "lo": 9.450000000000001,
+    "hi": 11.025,
+    "u": "m (laden, summer)",
+    "st": "UNVERIFIED"
+   },
+   "ship_beam_capesize": {
+    "c": 45.0,
+    "lo": 42.75,
+    "hi": 47.25,
+    "u": "m",
+    "st": "UNVERIFIED"
+   },
+   "ship_draught_capesize": {
+    "c": 18.2,
+    "lo": 16.38,
+    "hi": 19.11,
+    "u": "m (laden, summer)",
+    "st": "UNVERIFIED"
+   },
    "slaking_onshore": {
     "c": 5.0,
     "lo": 3.0,
@@ -713,7 +771,11 @@
    "variant": "NOAK",
    "which": "central",
    "horizon_yr": 15,
-   "omega_cap": 5.0,
+   "cap_model": "wake",
+   "omega_cap": 10.0,
+   "injection": "manifold",
+   "k1_override": -1.0,
+   "r_eng_kg_s": -1.0,
    "dilution": 1.0,
    "rate_nom_kg_s": 25.0,
    "jurisdiction": "own",
@@ -797,13 +859,24 @@
    "omega_caps": [
     5.0,
     7.0,
-    12.5
+    7.5,
+    10.0,
+    12.5,
+    16.0
    ],
    "dilution": [
     1.0,
     3.0,
     10.0
-   ]
+   ],
+   "wake_const": 3.79726625e-05,
+   "k1": {
+    "single": 0.1,
+    "two_outlet": 0.15,
+    "manifold": 0.3,
+    "wide": 1.0
+   },
+   "ballast_frac": 0.55
   },
   "clean_grid_threshold_g": 50
  }

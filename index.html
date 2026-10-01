@@ -223,8 +223,8 @@
         <option value="e15" selected>Efficiency after 15 years</option>
         <option value="e10">Efficiency after 10 years</option>
         <option value="e5">Efficiency after 5 years</option>
-        <option value="r5">Discharge limit, conservative (Ω ≤ 5)</option>
-        <option value="r12">Discharge limit, permissive (Ω ≤ 12.5)</option>
+        <option value="rc">Discharge limit, Capesize</option>
+        <option value="rh">Discharge limit, Handysize</option>
         <option value="none">None</option>
       </select>
     </section>
@@ -267,13 +267,12 @@ const $ = id => document.getElementById(id);
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const COST_BINS = [150, 180, 210, 240, 280, 350];
 const ETA_BINS = [0.5, 0.6, 0.7, 0.75, 0.8, 0.85];
-const RATE_BINS = [10, 15, 20, 25, 50, 75];
 const OCEAN = {
   e15: ["Ocean efficiency after 15 years, mol CO₂ per mol alkalinity", ETA_BINS],
   e10: ["Ocean efficiency after 10 years, mol CO₂ per mol alkalinity", ETA_BINS],
   e5: ["Ocean efficiency after 5 years, mol CO₂ per mol alkalinity", ETA_BINS],
-  r5: ["Max discharge per ship without precipitation (Ω ≤ 5), kg/s", RATE_BINS],
-  r12: ["Max discharge per ship without precipitation (Ω ≤ 12.5), kg/s", RATE_BINS]};
+  rc: ["Max discharge per Capesize ship without precipitation, kg/s", [24, 26, 28, 30, 32, 34]],
+  rh: ["Max discharge per Handysize ship without precipitation, kg/s", [9, 9.5, 10, 11, 12, 13]]};
 const COMP = [["Quarry", [0]], ["Kiln and CO₂ capture", [1]], ["CO₂ transport and storage", [2]],
               ["Land haul", [3]], ["Port and dispersal", [4, 5, 6]], ["MRV, operations, working capital", [7, 8]]];
 const STATUS = {prospect: "Magnesite prospect", past: "Former magnesite mine"};
@@ -369,8 +368,8 @@ function renderMethod(M) {
   <div class="eq"><var>C</var><sub>capital</sub> = <var>K</var> · CRF / CF, &nbsp;&nbsp; CRF = <var>r</var>(1 + <var>r</var>)<sup><var>n</var></sup> / ((1 + <var>r</var>)<sup><var>n</var></sup> − 1)</div>
   <p class="where"><var>K</var> = capex per t/yr of capacity; <var>r</var> = ${pct(M.params.wacc.c)} real WACC; <var>n</var> = ${P("life_plant")} years (CRF = ${fmt(crf(M.params.wacc.c, M.params.life_plant.c), 3)}); CF = ${pct(M.params.capacity_factor_kiln.c)} capacity factor.</p>
   <h4>Ship discharge limit</h4>
-  <div class="eq"><var>r</var> = min( <var>r</var><sub>nominal</sub>, &nbsp;<var>r</var><sub>ref</sub> · ΔTA<sub>allow</sub>(Ω<sup>*</sup>) / ΔTA<sub>ref</sub> · <var>f</var><sub>dilution</sub> )</div>
-  <p class="where"><var>r</var><sub>nominal</sub> = ${fmt(S.rate_nom_kg_s)} kg/s of Ca(OH)₂; <var>r</var><sub>ref</sub> = ${fmt(M.chem.ref_rate)} kg/s and ΔTA<sub>ref</sub> ≈ ${fmt(M.chem.ref_dta)} µmol/kg from Caserini et al. 2021's wake model; ΔTA<sub>allow</sub> is the alkalinity increment that raises aragonite saturation to Ω<sup>*</sup> = ${fmt(S.omega_cap, 1)} for the polygon's surface water that month (PyCO2SYS, control-run chemistry); <var>f</var><sub>dilution</sub> = ${fmt(S.dilution, 0)}. Discharge time then sets ship-days per tonne:</p>
+  <div class="eq"><var>r</var> = min( <var>r</var><sub>eng</sub>, &nbsp;${fmt(M.chem.wake_const * 1e5, 3)}×10<sup>−5</sup> · ΔTA<sub>allow</sub>(Ω<sup>*</sup>) · <var>k</var><sub>1</sub> · <var>B</var> · <var>T</var> · <var>U</var> ) &nbsp; kg/s Ca(OH)₂</div>
+  <p class="where">The seawater volume flux through the ship's wake (beam <var>B</var> × draught <var>T</var> × speed <var>U</var> = ${P("ship_discharge_speed")} km/h) times the fraction <var>k</var><sub>1</sub> that the most concentrated part of the plume has mixed into 1 minute after release, carrying alkalinity up to ΔTA<sub>allow</sub>. ΔTA<sub>allow</sub> is the increment that raises aragonite saturation to Ω<sup>*</sup> = ${fmt(S.omega_cap, 1)} in the polygon's surface water that month (PyCO2SYS, control-run chemistry); lab experiments show onset of CaCO₃ precipitation takes about a day at Ω ≈ 7.5 and that early dilution stops it (Moras et al. 2022). <var>k</var><sub>1</sub> = ${fmt(M.chem.k1[S.injection], 2)} for the default ${S.injection.replace("_", " ")} injection ($${P("ship_manifold_capex")} per ship; ${fmt(M.chem.k1.two_outlet, 2)} for two outlets, ${fmt(M.chem.k1.single, 2)} for a single outlet). Beam × draught runs from ${P("ship_beam_handysize")} × ${P("ship_draught_handysize", 1)} m (Handysize) to ${P("ship_beam_capesize")} × ${P("ship_draught_capesize", 1)} m (Capesize), so larger ships discharge faster. The rate falls with draught as the ship lightens (to ${pct(M.chem.ballast_frac)} of laden), and is capped at <var>r</var><sub>eng</sub> = ${P("ship_discharge_max")} kg/s per ship by onboard slaking and pumping. Discharge time then sets ship-days per tonne:</p>
   <div class="eq"><var>C</var><sub>ship</sub> = [ <var>t</var><sub>port</sub> + 2<var>d</var>/<var>v</var> + <var>m</var><sub>hydrate</sub>/<var>r</var> ] · (charter + operations) / payload + fuel + slaking + retrofit</div>
   <p class="where"><var>d</var> = sea distance from port to the dispersal polygon (searoute network; no canal transits; at most ${fmt(S.max_transit_km)} km); <var>v</var> = vessel service speed; the fleet class is the cheapest the port can take (Handysize to Capesize by berth depth); the polygon is chosen separately for each release season within the jurisdiction.</p>
   <h4>Coastal outfalls</h4>
@@ -405,8 +404,8 @@ function renderMethod(M) {
     ${row("Plant scale", "1 Mt oxide/yr", "Sensitivities at 0.2 and 5 Mt/yr planned")}
     ${row("Maturity and year", `${S.variant}, ${S.year}`, "FOAK and 2030/2050 in the scenario suite")}
     ${row("Ocean efficiency horizon", `${S.horizon_yr} years`, "Longest simulated; curves still rising, so conservative")}
-    ${row("Saturation limit in the ship wake", `Ω<sub>arag</sub> ≤ ${fmt(S.omega_cap, 1)}`, "Moras et al. 2022; 7 and 12.5 as sensitivities")}
-    ${row("Nominal ship discharge", `${fmt(S.rate_nom_kg_s)} kg/s Ca(OH)₂`, "Capped per polygon by the saturation limit")}
+    ${row("Saturation limit in the ship wake", `Ω<sub>arag</sub> ≤ ${fmt(S.omega_cap, 1)} at 1 min`, "Moras et al. 2022, Varliero et al. 2024; 7.5 and 16 as sensitivities")}
+    ${row("Ship discharge", `Up to ${P("ship_discharge_max")} kg/s Ca(OH)₂ per ship`, "Set by the wake limit for the ship class, polygon and season")}
     ${row("Jurisdiction", S.jurisdiction === "own" ? "Own EEZ" : "Any EEZ", `Polygon counts if the port's country holds ≥ ${pct(S.own_eez_min_frac)} of it or ≥ ${fmt(S.own_eez_min_km2)} km²`)}
     ${row("Port reach", `≤ ${fmt(S.max_port_km)} km, ${S.n_ports} nearest`, "Great Lakes, Seaway and far-inland river ports excluded")}
     ${row("Dispersal transit", `≤ ${fmt(S.max_transit_km)} km one way`, "No Panama or Suez transits")}
@@ -437,7 +436,7 @@ function renderMethod(M) {
   <ul><li>Central estimates only; no uncertainty ranges yet.</li>
       <li>Sources are optimised independently; shared ports, storage and dispersal water are not rationed, so costs must not be summed.</li>
       <li>Ocean efficiency is from one ~100 km model with a single release year; coastal values are outside its skill and the Mediterranean, Baltic and Hudson Bay are not covered.</li>
-      <li>The ship discharge limit rests on one wake model and an assumed saturation threshold.</li>
+      <li>The ship discharge limit rests on one field measurement of near-ship wake mixing and on lab precipitation thresholds; it is uncertain by a factor of 3 to 5.</li>
       <li>Most chains rely on CO₂ storage assessed only at basin level or not yet appraised.</li>
       <li>Magnesia dissolution, market leakage, permitting time and river alkalinity are not modelled.</li></ul>
   <h3>Internal to Frontier</h3>
@@ -477,7 +476,7 @@ function drawPolys() {
     onEachFeature: (f, l) => l.bindTooltip(() => {
       const p = f.properties;
       return `<b>Efficiency</b> ${fmt(p.e5, 2)} at 5 yr, ${fmt(p.e10, 2)} at 10, ${fmt(p.e15, 2)} at 15<br>` +
-        `<b>Discharge limit</b> ${fmt(p.r5, 0)} kg/s (Ω ≤ 5), ${fmt(p.r12, 0)} kg/s (Ω ≤ 12.5)<br>` +
+        `<b>Discharge limit</b> ${fmt(p.rh, 0)} kg/s Handysize, ${fmt(p.rc, 0)} kg/s Capesize<br>` +
         `<span style="color:var(--ink-3)">Surface ${fmt(p.sst, 1)} °C, aragonite saturation ${fmt(p.om, 1)}</span>`; },
       {sticky: true, direction: "top", offset: [0, -8]})
   }).addTo(map);
